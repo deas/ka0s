@@ -1,0 +1,13 @@
+---
+# TODO This repo does not provide this built artifact that we are looking for
+apiVersion: source.toolkit.fluxcd.io/v1beta2
+kind: GitRepository
+metadata:
+  name: knative-operator
+  namespace: flux-system
+spec:
+  interval: 30m0s
+  ref:
+    branch: main
+  url: https://github.com/knative/operator
+

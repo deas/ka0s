@@ -1,0 +1,13 @@
+# kubectl -n litmus patch deployment litmus-server --type=json --patch-file patch-litmus-server-ca-certs.yaml
+- op: add
+  path: "/spec/template/spec/volumes/-"
+  value:
+   name: ca-certs
+   secret:
+     secretName: ca-certs
+- op: add
+  path: "/spec/template/spec/containers/0/volumeMounts/-"
+  value:
+    name: ca-certs
+    mountPath: "/etc/ssl/certs/ca-certificates.crt"
+    subPath: "ca-certificates.crt"

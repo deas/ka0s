@@ -1,0 +1,11 @@
+# kubectl -n litmus patch deployment litmus-server --type=json --patch-file patch-litmus-server-proxy.yaml
+- op: add
+  path: "/spec/template/spec/containers/0/env/-"
+  value:
+   name: NO_PROXY
+   value: ".cluster.local.,.cluster.local,.svc"
+- op: add
+  path: "/spec/template/spec/containers/0/env/-"
+  value:
+    name: HTTPS_PROXY
+    value: "http://192.168.1.121:3128"

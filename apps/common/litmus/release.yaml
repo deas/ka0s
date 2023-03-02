@@ -1,0 +1,45 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: litmus
+  namespace: litmus
+spec:
+  releaseName: litmus
+  chart:
+    spec:
+      chart: litmus
+      sourceRef:
+        kind: HelmRepository
+        name: litmuschaos
+        namespace: flux-system
+      version: "2.15.10"
+      # version: "16.x"
+  interval: 5m
+  install:
+    remediation:
+      retries: 3
+  values:
+    portal:
+      frontend:
+        service:
+          type: LoadBalancer
+    #server:
+    ## TODO: chaos-litmus-server should support HTTPS_PROXY, HTTP_PROXY, NO_PROXY and ca certs (via mount)
+    ## TODO: Appears to be minimal bit to get proxy - should probably tweak upstream chart, or use https://fluxcd.io/flux/components/helm/helmreleases/#post-renderers
+    #  graphqlServer:
+    #    genericEnv:
+    #      TLS_SECRET_NAME: ""
+    #      TLS_CERT_64: ""
+    #      SELF_AGENT: "true"
+    #      SELF_AGENT_NODE_SELECTOR: ""
+    #      SELF_AGENT_TOLERATIONS: ""
+    #      CONTAINER_RUNTIME_EXECUTOR: "k8sapi"
+    #      HUB_BRANCH_NAME: "v2.14.x"
+    #      AGENT_DEPLOYMENTS: '["app=chaos-exporter", "name=chaos-operator", "app=event-tracker", "app=workflow-controller"]'
+    #      LITMUS_AUTH_GRPC_PORT: ":3030"
+    #      WORKFLOW_HELPER_IMAGE_VERSION: "2.14.0"
+    #      REMOTE_HUB_MAX_SIZE: "5000000"
+    #      # Provide UI endpoint if using namespaced scope
+    #      CHAOS_CENTER_UI_ENDPOINT: ""
+    #      # HTTPS_PROXY: "http://192.168.1.121:3128"
+    #      # NO_PROXY: ".cluster.local.,.cluster.local,.svc"
