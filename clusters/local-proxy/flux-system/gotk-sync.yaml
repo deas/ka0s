@@ -12,7 +12,7 @@ spec:
   url: https://github.com/deas/ka0s  
   #secretRef:
   #  name: flux-system
-  #url: ssh://git@github.com/deas/ka0s
+  # url: ssh://git@github.com/deas/ka0s
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
 kind: Kustomization
@@ -21,7 +21,7 @@ metadata:
   namespace: flux-system
 spec:
   interval: 10m0s
-  path: ./clusters/local
+  path: ./clusters/local-proxy
   prune: true
   sourceRef:
     kind: GitRepository

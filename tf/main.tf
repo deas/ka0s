@@ -1,5 +1,7 @@
 # https://github.com/hashicorp/terraform/issues/28580#issuecomment-831263879
 terraform {
+  required_version = ">= 1.2"
+
   required_providers {
     kind = {
       source  = "tehcyx/kind"
@@ -21,6 +23,14 @@ terraform {
     kubectl = {
       source  = "gavinbunney/kubectl"
       version = ">= 1.10.0"
+    }
+    http = {
+      source  = "hashicorp/http"
+      version = ">= 3.2"
+    }
+    null = {
+      source  = "hashicorp/null"
+      version = ">= 3.2"
     }
     /* flux = {
       source  = "fluxcd/flux"
@@ -66,7 +76,12 @@ provider "kubectl" {
 }
 
 locals {
-  /*
+
+  ssh_keys = try({
+    private = file(var.id_rsa_ro_path)
+    public  = file(var.id_rsa_ro_pub_path)
+  }, null)
+
   additional_keys = zipmap(
     keys(var.additional_keys),
     [for secret in values(var.additional_keys) :
@@ -74,13 +89,7 @@ locals {
         keys(secret),
       [for path in values(secret) : file(path)])
   ])
-  bootstrap = try([
-    for v in data.kubectl_file_documents.bootstrap[0].documents : {
-      data : yamldecode(v)
-      content : v
-    }
-  ], {})
-  */
+
   metallb_native = [
     for v in data.kubectl_file_documents.metallb_native.documents : {
       data : yamldecode(v)
@@ -135,7 +144,7 @@ data "kubectl_file_documents" "metallb_native" {
 }
 
 module "metallb_config" {
-  source = "github.com/deas/terraform-modules//kind-metallb"
+  source = "github.com/deas/terraform-modules//kind-metallb?ref=main"
 }
 
 # TODO: metallb should probably be kicked off via flux as well
@@ -161,18 +170,32 @@ resource "kubectl_manifest" "metallb_config" {
   depends_on = [null_resource.metallb_wait]
 }
 
-module "flux" {
-  source = "github.com/deas/terraform-modules//flux"
+module "coredns" {
   # version
-  # branch          = var.flux_branch
-  flux_install = file("${var.filename_flux_path}/gotk-components.yaml")
-  flux_sync    = file("${var.filename_flux_path}/gotk-sync.yaml")
-  tls_key = {
-    private = file(var.id_rsa_fluxbot_ro_path)
-    public  = file(var.id_rsa_fluxbot_ro_pub_path)
+  # source          = "../../terraform-modules/coredns"
+  source = "github.com/deas/terraform-modules//coredns?ref=main"
+  hosts  = var.dns_hosts
+  count  = var.dns_hosts != null ? 1 : 0
+}
+
+resource "kubernetes_namespace" "flux-system" {
+  metadata {
+    name = "flux-system"
   }
-  # additional_keys = local.additional_keys
+}
+
+module "flux" {
+  #source    = "../../terraform-modules/flux"
+  namespace          = kubernetes_namespace.flux-system.metadata[0].name
+  bootstrap_manifest = try(file(var.bootstrap_path), null)
+  # count           = 0
+  source          = "github.com/deas/terraform-modules//flux?ref=main"
+  flux_install    = file("${var.filename_flux_path}/gotk-components.yaml")
+  flux_sync       = file("${var.filename_flux_path}/gotk-sync.yaml")
+  tls_key         = local.ssh_keys
+  additional_keys = local.additional_keys
   providers = {
     kubernetes = kubernetes
+    kubectl    = kubectl
   }
 }

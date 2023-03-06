@@ -19,3 +19,4 @@ bin/
 .direnv/
 scratch/
 keys/
+target/

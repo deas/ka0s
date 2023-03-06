@@ -24,13 +24,16 @@
                 {
                   # https://devenv.sh/reference/options/
                   packages = [
-                   #pkgs.terraform
-                   #pkgs.argocd
-                   #pkgs.fluxcd
-                   #pkgs.helm # not the helm I was looking for
-                   #pkgs.kustomize
-                   #pkgs.kubectl
-                   # pkgs.docker
+                   pkgs.terraform
+                   pkgs.fluxcd
+                   pkgs.kubernetes-helm
+                   pkgs.kustomize
+                   #pkgs.kubernix
+                   pkgs.gnumake
+                   pkgs.github-cli
+                   #pkgs.babashka
+                   pkgs.kubectl
+                   #pkgs.docker
                    ];
 
                   enterShell = ''

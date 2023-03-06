@@ -3,7 +3,8 @@ kind: Kustomization
 namespace: flux-system
 resources:
   - bitnami.yaml
-  # - knative-operator.yaml
+  # - knative-operator.yaml # TODO: No generated manifests provided by maintainers
   # - podinfo.yaml
+  - flux.yaml
   - istio.yaml
   - litmuschaos.yaml

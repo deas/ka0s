@@ -4,17 +4,14 @@ variable "kind_cluster_name" {
   default     = "ka0s"
 }
 
-variable "target_path" {
-  type        = string
-  description = "flux sync target path"
+variable "id_rsa_ro_path" {
+  type    = string
+  default = null
 }
 
-variable "id_rsa_fluxbot_ro_path" {
-  type = string
-}
-
-variable "id_rsa_fluxbot_ro_pub_path" {
-  type = string
+variable "id_rsa_ro_pub_path" {
+  type    = string
+  default = null
 }
 
 variable "additional_keys" {
@@ -22,11 +19,18 @@ variable "additional_keys" {
   default = {}
 }
 
-variable "filename_flux_path" {
-  type    = string
-  default = "../simple/clusters/local/flux-system"
+variable "bootstrap_path" {
+  type        = string
+  default     = null
+  description = "Bootstrap path to yaml we apply before flux"
 }
 
-variable "cluster" {
-  type = string
+variable "filename_flux_path" {
+  type    = string
+  default = "../clusters/local/flux-system"
+}
+
+variable "dns_hosts" {
+  type    = map(string)
+  default = null
 }

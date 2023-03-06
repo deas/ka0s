@@ -3,8 +3,8 @@
   path: "/spec/template/spec/volumes/-"
   value:
    name: ca-certs
-   secret:
-     secretName: ca-certs
+   configMap:
+     name: ca-certs
 - op: add
   path: "/spec/template/spec/containers/0/volumeMounts/-"
   value:

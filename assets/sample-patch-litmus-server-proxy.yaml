@@ -2,10 +2,15 @@
 - op: add
   path: "/spec/template/spec/containers/0/env/-"
   value:
-   name: NO_PROXY
-   value: ".cluster.local.,.cluster.local,.svc"
+    name: NO_PROXY
+    value: ".cluster.local.,.cluster.local,.svc,litmus-auth-server-service"
 - op: add
   path: "/spec/template/spec/containers/0/env/-"
   value:
     name: HTTPS_PROXY
     value: "http://192.168.1.121:3128"
+- op: add
+  path: "/spec/template/spec/containers/0/env/-"
+  value:
+    name: KUBERNETES_SERVICE_HOST
+    value: "kubernetes.default.svc.cluster.local"    
