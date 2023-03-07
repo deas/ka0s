@@ -170,12 +170,16 @@ resource "kubectl_manifest" "metallb_config" {
   depends_on = [null_resource.metallb_wait]
 }
 
+# Be careful with this module. It will patch coredns configmap ;)
 module "coredns" {
   # version
   # source          = "../../terraform-modules/coredns"
   source = "github.com/deas/terraform-modules//coredns?ref=main"
   hosts  = var.dns_hosts
   count  = var.dns_hosts != null ? 1 : 0
+  providers = {
+    kubectl = kubectl
+  }
 }
 
 resource "kubernetes_namespace" "flux-system" {
@@ -188,12 +192,11 @@ module "flux" {
   #source    = "../../terraform-modules/flux"
   namespace          = kubernetes_namespace.flux-system.metadata[0].name
   bootstrap_manifest = try(file(var.bootstrap_path), null)
-  # count           = 0
-  source          = "github.com/deas/terraform-modules//flux?ref=main"
-  flux_install    = file("${var.filename_flux_path}/gotk-components.yaml")
-  flux_sync       = file("${var.filename_flux_path}/gotk-sync.yaml")
-  tls_key         = local.ssh_keys
-  additional_keys = local.additional_keys
+  source             = "github.com/deas/terraform-modules//flux?ref=main"
+  flux_install       = file("${var.filename_flux_path}/gotk-components.yaml")
+  flux_sync          = file("${var.filename_flux_path}/gotk-sync.yaml")
+  tls_key            = local.ssh_keys
+  additional_keys    = local.additional_keys
   providers = {
     kubernetes = kubernetes
     kubectl    = kubectl

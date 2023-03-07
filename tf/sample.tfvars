@@ -1,4 +1,5 @@
-#filename_flux_path = "../clusters/local/flux-system"
+# Sample overrides for local-proxy
+#filename_flux_path = "../clusters/local-proxy/flux-system"
 #bootstrap_path  = "../target/manifest-ca-certs.yaml"
 #dns_hosts = { "192.168.1.121" = "proxy.local" }
 #id_rsa_ro_path     = "../keys/id_rsa-ka0s"

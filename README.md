@@ -65,6 +65,8 @@ make -n patch-litmus-ca-certs patch-litmus-proxy-env
 
 should give you an idea how we patch a system.
 
+The `terraform` module provides a mechanism to patch the `coredns` `ConfigMap`. This may come in handy when working with a proxy.
+
 I use `mitmproxy` locally to try things out.
 
 ## Known Issues

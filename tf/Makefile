@@ -21,6 +21,8 @@ SHELL := /usr/bin/env bash
 DOCKER_TAG_VERSION_DEVELOPER_TOOLS := 1.3
 DOCKER_IMAGE_DEVELOPER_TOOLS := cft/developer-tools
 REGISTRY_URL := gcr.io/cloud-foundation-cicd
+TF_PLUGINS_NAME := tf-plugins-ka0s
+TF_PLUGINS_IMAGE := deas/$(TF_PLUGINS_NAME):latest
 
 DEFAULT_GOAL := help
 
@@ -50,6 +52,19 @@ help:  ## Display this help
 #.PHONY: docker_test_integration
 #docker_test_integration:
 #	docker run --rm -it \
+
+.PHONY: docker-build-tf-plugins
+docker-build-tf-plugins: ## Build terraform plugin image for restricted environments
+	docker build --tag $(TF_PLUGINS_IMAGE) .
+
+.PHONY: docker-import-tf-plugins
+docker-import-tf-plugins: ## Pull and extract terraform plugins
+	docker pull $(TF_PLUGINS_IMAGE)
+	docker rm $(TF_PLUGINS_NAME) || true
+	docker create --name $(TF_PLUGINS_NAME) $(TF_PLUGINS_IMAGE)
+	rm -rf plugin-cache
+	docker cp $(TF_PLUGINS_NAME):/plugin-cache .
+	docker rm $(TF_PLUGINS_NAME)
 
 .PHONY: docker-test-lint
 docker-test-lint: ## Lint within docker container
