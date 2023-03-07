@@ -5,3 +5,7 @@
 #id_rsa_ro_path     = "../keys/id_rsa-ka0s"
 #id_rsa_ro_pub_path = "../keys/id_rsa-ka0s.pub"
 #additional_keys            = { "sops-gpg" = { "sops.asc" = "../keys/ka0s-priv.asc" } }
+#extra_mounts = [{
+#  "container_path" = "/etc/ssl/certs/ca-certificates.crt"
+#  "host_path"      = "/etc/ssl/certs/ca-certificates.crt"
+#}]

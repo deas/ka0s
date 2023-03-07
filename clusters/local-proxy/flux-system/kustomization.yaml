@@ -1,45 +1,45 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-# - hack.yaml
 - gotk-components.yaml
 - gotk-sync.yaml
+# Cannot patch proxy here: 🐔 and 🥚 problem when intial repo is via https
 # TODO: For the moment, we do not want to add the configmap here (and hence commit it to git). We do it via terraform to be play for everybody
 # proxy.local here meant to be generic so everybody can set it via terraform
-patches:
-  - patch: |
-      apiVersion: apps/v1
-      kind: Deployment
-      metadata:
-        name: all
-      spec:
-        template:
-          spec:
-            containers:
-              - name: manager
-                env:
-                  - name: "HTTPS_PROXY"
-                    value: "http://proxy.local:3128"
-                  - name: "NO_PROXY"
-                    value: ".cluster.local.,.cluster.local,.svc"
-                  - name: "KUBERNETES_SERVICE_HOST"
-                    value: "kubernetes.default.svc.cluster.local"  
-    target:
-      kind: Deployment
-      labelSelector: app.kubernetes.io/part-of=flux
-  - patch: |
-      - op: add
-        path: "/spec/template/spec/volumes/-"
-        value:
-          name: ca-certs
-          configMap:
-            name: ca-certs
-      - op: add
-        path: "/spec/template/spec/containers/0/volumeMounts/-"
-        value:
-          name: ca-certs
-          mountPath: "/etc/ssl/certs/ca-certificates.crt"
-          subPath: "ca-certificates.crt"
-    target:
-      kind: Deployment
-      labelSelector: app.kubernetes.io/part-of=flux
+# patches:
+#   - patch: |
+#       apiVersion: apps/v1
+#       kind: Deployment
+#       metadata:
+#         name: all
+#       spec:
+#         template:
+#           spec:
+#             containers:
+#               - name: manager
+#                 env:
+#                   - name: "HTTPS_PROXY"
+#                     value: "http://proxy.local:3128"
+#                   - name: "NO_PROXY"
+#                     value: ".cluster.local.,.cluster.local,.svc"
+#                   - name: "KUBERNETES_SERVICE_HOST"
+#                     value: "kubernetes.default.svc.cluster.local"  
+#     target:
+#       kind: Deployment
+#       labelSelector: app.kubernetes.io/part-of=flux
+#   - patch: |
+#       - op: add
+#         path: "/spec/template/spec/volumes/-"
+#         value:
+#           name: ca-certs
+#           configMap:
+#             name: ca-certs
+#       - op: add
+#         path: "/spec/template/spec/containers/0/volumeMounts/-"
+#         value:
+#           name: ca-certs
+#           mountPath: "/etc/ssl/certs/ca-certificates.crt"
+#           subPath: "ca-certificates.crt"
+#     target:
+#       kind: Deployment
+#       labelSelector: app.kubernetes.io/part-of=flux

@@ -6395,6 +6395,12 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
+        - name: "HTTPS_PROXY"
+          value: "http://proxy.local:3128"
+        - name: "NO_PROXY"
+          value: ".cluster.local.,.cluster.local,.svc"
+        - name: "KUBERNETES_SERVICE_HOST"
+          value: "kubernetes.default.svc.cluster.local"
         image: ghcr.io/fluxcd/helm-controller:v0.30.0
         imagePullPolicy: IfNotPresent
         livenessProbe:
@@ -6432,6 +6438,9 @@ spec:
         volumeMounts:
         - mountPath: /tmp
           name: temp
+        - name: ca-certs
+          mountPath: "/etc/ssl/certs/ca-certificates.crt"
+          subPath: "ca-certificates.crt"
       nodeSelector:
         kubernetes.io/os: linux
       securityContext:
@@ -6441,6 +6450,9 @@ spec:
       volumes:
       - emptyDir: {}
         name: temp
+      - name: ca-certs
+        configMap:
+          name: ca-certs
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -6478,6 +6490,12 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
+        - name: "HTTPS_PROXY"
+          value: "http://proxy.local:3128"
+        - name: "NO_PROXY"
+          value: ".cluster.local.,.cluster.local,.svc"
+        - name: "KUBERNETES_SERVICE_HOST"
+          value: "kubernetes.default.svc.cluster.local"
         image: ghcr.io/fluxcd/kustomize-controller:v0.34.0
         imagePullPolicy: IfNotPresent
         livenessProbe:
@@ -6515,6 +6533,9 @@ spec:
         volumeMounts:
         - mountPath: /tmp
           name: temp
+        - name: ca-certs
+          mountPath: "/etc/ssl/certs/ca-certificates.crt"
+          subPath: "ca-certificates.crt"
       nodeSelector:
         kubernetes.io/os: linux
       securityContext:
@@ -6524,6 +6545,9 @@ spec:
       volumes:
       - emptyDir: {}
         name: temp
+      - name: ca-certs
+        configMap:
+          name: ca-certs
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -6560,6 +6584,12 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
+        - name: "HTTPS_PROXY"
+          value: "http://proxy.local:3128"
+        - name: "NO_PROXY"
+          value: ".cluster.local.,.cluster.local,.svc"
+        - name: "KUBERNETES_SERVICE_HOST"
+          value: "kubernetes.default.svc.cluster.local"
         image: ghcr.io/fluxcd/notification-controller:v0.32.0
         imagePullPolicy: IfNotPresent
         livenessProbe:
@@ -6603,6 +6633,9 @@ spec:
         volumeMounts:
         - mountPath: /tmp
           name: temp
+        - name: ca-certs
+          mountPath: "/etc/ssl/certs/ca-certificates.crt"
+          subPath: "ca-certificates.crt"
       nodeSelector:
         kubernetes.io/os: linux
       securityContext:
@@ -6612,6 +6645,9 @@ spec:
       volumes:
       - emptyDir: {}
         name: temp
+      - name: ca-certs
+        configMap:
+          name: ca-certs
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -6655,6 +6691,12 @@ spec:
               fieldPath: metadata.namespace
         - name: TUF_ROOT
           value: /tmp/.sigstore
+        - name: "HTTPS_PROXY"
+          value: "http://proxy.local:3128"
+        - name: "NO_PROXY"
+          value: ".cluster.local.,.cluster.local,.svc"
+        - name: "KUBERNETES_SERVICE_HOST"
+          value: "kubernetes.default.svc.cluster.local"
         image: ghcr.io/fluxcd/source-controller:v0.35.2
         imagePullPolicy: IfNotPresent
         livenessProbe:
@@ -6697,6 +6739,9 @@ spec:
           name: data
         - mountPath: /tmp
           name: tmp
+        - name: ca-certs
+          mountPath: "/etc/ssl/certs/ca-certificates.crt"
+          subPath: "ca-certificates.crt"
       nodeSelector:
         kubernetes.io/os: linux
       securityContext:
@@ -6708,6 +6753,9 @@ spec:
         name: data
       - emptyDir: {}
         name: tmp
+      - name: ca-certs
+        configMap:
+          name: ca-certs
 ---
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy

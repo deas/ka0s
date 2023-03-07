@@ -5,7 +5,7 @@ terraform {
   required_providers {
     kind = {
       source  = "tehcyx/kind"
-      version = "0.0.14"
+      version = ">= 0.0.14"
     }
     /*
     github = {
@@ -24,6 +24,11 @@ terraform {
       source  = "gavinbunney/kubectl"
       version = ">= 1.10.0"
     }
+    /*
+    kustomization = {
+      source  = "kbst/kustomization"
+      version = "0.9.0"
+    }*/
     http = {
       source  = "hashicorp/http"
       version = ">= 3.2"
@@ -75,6 +80,12 @@ provider "kubectl" {
   load_config_file = false
 }
 
+/*
+provider "kustomization" {
+  kubeconfig_raw = kind_cluster.default.kubeconfig
+}
+*/
+
 locals {
 
   ssh_keys = try({
@@ -114,6 +125,13 @@ resource "kind_cluster" "default" {
 
     node {
       role = "control-plane"
+      dynamic "extra_mounts" {
+        for_each = var.extra_mounts
+        content {
+          container_path = extra_mounts.value["container_path"]
+          host_path      = extra_mounts.value["host_path"]
+        }
+      }
     }
 
     # Cilium
@@ -193,10 +211,12 @@ module "flux" {
   namespace          = kubernetes_namespace.flux-system.metadata[0].name
   bootstrap_manifest = try(file(var.bootstrap_path), null)
   source             = "github.com/deas/terraform-modules//flux?ref=main"
-  flux_install       = file("${var.filename_flux_path}/gotk-components.yaml")
-  flux_sync          = file("${var.filename_flux_path}/gotk-sync.yaml")
-  tls_key            = local.ssh_keys
-  additional_keys    = local.additional_keys
+  # TODO: Replace kubectl with kustomize in the flux module
+  # flux_kustomization = "..."
+  flux_install    = file("${var.filename_flux_path}/gotk-components.yaml")
+  flux_sync       = file("${var.filename_flux_path}/gotk-sync.yaml")
+  tls_key         = local.ssh_keys
+  additional_keys = local.additional_keys
   providers = {
     kubernetes = kubernetes
     kubectl    = kubectl

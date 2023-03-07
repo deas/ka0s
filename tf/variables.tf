@@ -34,3 +34,8 @@ variable "dns_hosts" {
   type    = map(string)
   default = null
 }
+
+variable "extra_mounts" {
+  type    = list(map(string))
+  default = []
+}
