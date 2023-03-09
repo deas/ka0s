@@ -55,11 +55,11 @@ module "metallb_config" {
 }
 
 module "metallb" {
-  count            = var.metallb ? 1 : 0
-  source           = "../../terraform-modules/metalllb"
+  count  = var.metallb ? 1 : 0
+  source = "github.com/deas/terraform-modules//kind-metallb?ref=main"
+  # source           = "../../terraform-modules/metalllb"
   install_manifest = data.http.metallb_native[0].response_body
   config_manifest  = module.metallb_config[0].manifest
-  # source = "github.com/deas/terraform-modules//kind-metallb?ref=main"
   providers = {
     # kubernetes    = kubernetes
     kubectl = kubectl
@@ -82,8 +82,8 @@ module "coredns" {
 
 module "flux" {
   # TODO: Replace kubectl with kustomize in the flux module
-  # source             = "github.com/deas/terraform-modules//flux?ref=main"
-  source             = "../../terraform-modules/flux"
+  source = "github.com/deas/terraform-modules//flux?ref=main"
+  # source             = "../../terraform-modules/flux"
   namespace          = "flux-system"
   bootstrap_manifest = try(file(var.bootstrap_path), null)
   kustomization_path = var.flux_kustomization_path
