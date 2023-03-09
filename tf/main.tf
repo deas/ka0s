@@ -56,16 +56,10 @@ module "metallb_config" {
 
 module "metallb" {
   count  = var.metallb ? 1 : 0
-  source = "github.com/deas/terraform-modules//kind-metallb?ref=main"
-  # source           = "../../terraform-modules/metalllb"
+  source = "github.com/deas/terraform-modules//metallb?ref=main"
+  # source           = "../../terraform-modules/metallb"
   install_manifest = data.http.metallb_native[0].response_body
   config_manifest  = module.metallb_config[0].manifest
-  providers = {
-    # kubernetes    = kubernetes
-    kubectl = kubectl
-    # kustomization = kustomization
-  }
-
 }
 
 # Be careful with this module. It will patch coredns configmap ;)
