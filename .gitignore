@@ -20,3 +20,4 @@ bin/
 scratch/
 keys/
 target/
+plugin-cache/

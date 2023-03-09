@@ -1,7 +1,8 @@
 variable "kind_cluster_name" {
   type        = string
   description = "Cluster name"
-  default     = "ka0s"
+  default     = null
+  # default     = "ka0s"
 }
 
 variable "id_rsa_ro_path" {
@@ -25,7 +26,7 @@ variable "bootstrap_path" {
   description = "Bootstrap path to yaml we apply before flux"
 }
 
-variable "filename_flux_path" {
+variable "flux_kustomization_path" {
   type    = string
   default = "../clusters/local/flux-system"
 }
@@ -38,4 +39,9 @@ variable "dns_hosts" {
 variable "extra_mounts" {
   type    = list(map(string))
   default = []
+}
+
+variable "metallb" {
+  type    = bool
+  default = true
 }

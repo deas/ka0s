@@ -86,8 +86,8 @@ apply: ## Terraform apply
 
 .PHONY: quick-destroy
 quick-destroy: ## Quick destruction
-	docker stop ka0s-control-plane
-	docker rm ka0s-control-plane
+	docker stop ka0s-control-plane || true
+	docker rm ka0s-control-plane || true
 	rm -rf 	terraform.tfstate*
 
 .PHONY: open-app
