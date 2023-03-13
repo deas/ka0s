@@ -1,6 +1,6 @@
 # default is null -> use cluster from env
 kind_cluster_name = "ka0s"
-metallb           = true
+# metallb           = true
 # Sample overrides for local-proxy
 # flux_kustomization_path = "../clusters/local-proxy/flux-system"
 # bootstrap_path  = "../target/manifest-ca-certs.yaml"
