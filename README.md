@@ -80,7 +80,9 @@ I use `mitmproxy` locally to try things out.
 - Add GitOps experiments
 - Manifests Naming
 - Split up `tf` module?
-- Fix annoying terraform plan ` yaml_incluster `
+- Fix annoying terraform plan ` yaml_incluster`
+- Add knative-serving/eventing/dns (using `nip.io`?)
+- Istio Ingress appears to have an image pulling issue, so it takes a while to come up
 
 ## Know Issues
 - Knative deployment straight from github deployment not possible
