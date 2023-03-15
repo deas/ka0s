@@ -69,23 +69,27 @@ The `terraform` module provides a mechanism to patch the `coredns` `ConfigMap`. 
 
 I use `mitmproxy` locally to try things out.
 
-## Known Issues
-- knative challenging (Some bits need `kustomize.toolkit.fluxcd.io/substitute: disabled` in our context, other things need tweaks to upstream yaml to play with GitOps "... configured")
 
 ## TODO
 - There are TODO tags in the code
 - Add first class support for `mitmproxy` (ship deployment)
 - Add first class support for remote agent?
 - Leverage prometheus properly
-- Add GitOps experiments
+- Try GitOps scenarios?
+- Add sample hub (as branch here - just like `gh_pages`?)
 - Manifests Naming
 - Split up `tf` module?
 - Fix annoying terraform plan ` yaml_incluster`
 - Add knative-serving/eventing/dns (using `nip.io`?)
-- Istio Ingress appears to have an image pulling issue, so it takes a while to come up
+- leverage `litmusctl`
+- Try it with [Sock Shop : A Microservice Demo Application](https://github.com/microservices-demo/microservices-demo)
+- How do we manage litmus projects (using ui?)?
+- Add mongodb/prometheus convenience (e.g. auth) targets to `Makefile` 
 
 ## Know Issues
 - Knative deployment straight from github deployment not possible
+- knative challenging (Some bits need `kustomize.toolkit.fluxcd.io/substitute: disabled` in our context, other things need tweaks to upstream yaml to play with GitOps "... configured")
+- Istio Ingress appears to have an image pulling issue, so it takes a while to come up
 
 ## Misc/Random Bits
 - https://istio.io/latest/docs/setup/install/helm
