@@ -86,7 +86,8 @@ I use `mitmproxy` locally to try things out.
 - How do we manage litmus projects (using ui?)?
 - Add mongodb/prometheus convenience (e.g. auth) targets to `Makefile` 
 
-## Know Issues
+## Known Issues
+- Some experiments from `litmus-go` appear to rely on `/var/run/docker.sock` which does not exist with containerd based environments
 - Knative deployment straight from github deployment not possible
 - knative challenging (Some bits need `kustomize.toolkit.fluxcd.io/substitute: disabled` in our context, other things need tweaks to upstream yaml to play with GitOps "... configured")
 - Istio Ingress appears to have an image pulling issue, so it takes a while to come up
