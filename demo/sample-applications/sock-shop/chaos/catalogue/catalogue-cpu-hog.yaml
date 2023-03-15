@@ -1,0 +1,37 @@
+apiVersion: litmuschaos.io/v1alpha1
+kind: ChaosEngine
+metadata:
+  name: catalogue-cpu-hog
+  namespace: litmus
+spec:
+  annotationCheck: 'false'
+  engineState: 'active'
+  auxiliaryAppInfo: ''
+  appinfo:
+    appns: 'sock-shop'
+    applabel: 'name=catalogue'
+    appkind: 'deployment'
+  chaosServiceAccount: litmus-admin
+  monitoring: true
+  jobCleanUpPolicy: 'retain'
+  experiments:
+    - name: pod-cpu-hog
+      spec:
+        components:
+          env:
+            - name: TARGET_CONTAINER
+              value: 'catalogue'
+
+            - name: CPU_CORES
+              value: '1'
+
+            - name: TOTAL_CHAOS_DURATION
+              value: '240' # in seconds
+
+            - name: CONTAINER_RUNTIME
+              value: 'containerd'
+
+            - name: SOCKET_PATH
+              value: /var/run/containerd/containerd.sock  
+
+            
