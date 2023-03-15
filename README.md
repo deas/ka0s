@@ -69,6 +69,8 @@ The `terraform` module provides a mechanism to patch the `coredns` `ConfigMap`. 
 
 I use `mitmproxy` locally to try things out.
 
+## Misc
+Grafana has default authentication `admin` / `prom-operator`.
 
 ## TODO
 - There are TODO tags in the code
@@ -84,7 +86,8 @@ I use `mitmproxy` locally to try things out.
 - leverage `litmusctl`
 - Try it with [Sock Shop : A Microservice Demo Application](https://github.com/microservices-demo/microservices-demo)
 - How do we manage litmus projects (using ui?)?
-- Add mongodb/prometheus convenience (e.g. auth) targets to `Makefile` 
+- Add mongodb/prometheus convenience (e.g. auth) targets to `Makefile`
+- Test drive 3.0-beta 
 
 ## Known Issues
 - Some experiments from `litmus-go` appear to rely on `/var/run/docker.sock` which does not exist with containerd based environments
