@@ -1,0 +1,72 @@
+apiVersion: litmuschaos.io/v1alpha1
+kind: ChaosEngine
+metadata:
+  name: catalogue-pod-delete-chaos
+  namespace: litmus # {{workflow.parameters.adminModeNamespace}}
+  labels:
+    context: "sock-shop_catalogue" # "{{workflow.parameters.appNamespace}}_catalogue"
+spec:
+  appinfo:
+    appns: 'sock-shop'
+    applabel: 'name=catalogue'
+    appkind: 'deployment'
+  engineState: 'active'
+  chaosServiceAccount: litmus-admin
+  jobCleanUpPolicy: 'retain'
+  components:
+    runner:
+      imagePullPolicy: Always
+  experiments:
+    # Catalogue pod takes 3 minutes to get ready?
+    - name: pod-delete
+      spec:
+        probe:
+        - name: "check-catalogue-access-url"
+          type: "httpProbe"
+          httpProbe/inputs:
+            url: "http://front-end.sock-shop.svc.cluster.local:80/catalogue"
+            insecureSkipVerify: false
+            # responseTimeout: 100
+            method:
+              get:
+                criteria: "=="
+                responseCode: "200"
+          mode: "Continuous"
+          runProperties:
+            probeTimeout: 1000
+            interval: 1
+            retry: 1
+        #    probeTimeout: 500
+        #    interval: 12
+        #    retry: 3
+        #    probePollingInterval: 1
+        # level=error msg="the check-benchmark cmd probe has been Failed, err: {actual value: 0} is not greater than or equal to {expected value: 100}"
+        #
+        - name: "check-benchmark"
+          type: "cmdProbe"
+          cmdProbe/inputs:
+            command: "curl http://qps-test.sock-shop.svc.cluster.local"
+            comparator:
+              type: "int" # supports: string, int, float
+              criteria: ">=" #supports >=,<=,>,<,==,!= for int and contains,equal,notEqual,matches,notMatches for string values
+              value: "100"
+          mode: "Edge"
+          runProperties:
+            probeTimeout: 1000
+            interval: 1
+            retry: 1
+        # runProperties:
+        #   probeTimeout: 500
+        #   interval: 1
+        #   retry: 2
+        #   initialDelaySeconds: 2
+        components:
+          env:
+            - name: TOTAL_CHAOS_DURATION
+              value: '30'
+            # set chaos interval (in sec) as desired
+            - name: CHAOS_INTERVAL
+              value: '10'
+            # pod failures without '--force' & default terminationGracePeriodSeconds
+            - name: FORCE
+              value: 'false'

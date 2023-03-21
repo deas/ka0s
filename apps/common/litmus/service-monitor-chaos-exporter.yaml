@@ -1,0 +1,33 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  annotations: {}
+  labels:
+    app: chaos-exporter
+    release: prometheus
+  name: chaos-exporter
+  namespace: litmus # monitoring
+spec:
+  endpoints:
+  - interval: 30s
+    port: tcp
+  # - bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
+  #   honorLabels: true
+  #   port: https-metrics
+  #   relabelings:
+  #   - action: replace
+  #     sourceLabels:
+  #     - __metrics_path__
+  #     targetLabel: metrics_path
+  #   scheme: https
+  #   tlsConfig:
+  #     caFile: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+  #     insecureSkipVerify: true
+  jobLabel: chaos-exporter
+  namespaceSelector:
+    matchNames:
+    - litmus # kube-system
+  selector:
+    matchLabels:
+      app: chaos-exporter
+      # app.kubernetes.io/name: kubelet

@@ -1,0 +1,38 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: loki
+  namespace: monitoring
+spec:
+  releaseName: loki
+  chart:
+    spec:
+      chart: loki
+      sourceRef:
+        kind: HelmRepository
+        name: grafana
+        namespace: flux-system
+      version: "4.8.0"
+  interval: 5m
+  install:
+    remediation:
+      retries: 3
+  values:
+    # Error: INSTALLATION FAILED: execution error at (loki/templates/validate.yaml:26:4): Cannot run Scalable targets (backend, read, write) without an object storage backend.
+    #minio:
+    #  enabled: true
+    loki:
+      commonConfig:
+        replication_factor: 1
+      storage:
+        type: 'filesystem'
+    singleBinary: # TODO: Does not render grafana dashboards
+      replicas: 1
+    # https://github.com/grafana/loki/issues/7907
+    memberlist:
+      service:
+        publishNotReadyAddresses: true
+    monitoring:
+      serviceMonitor:
+        labels:
+          release: prometheus

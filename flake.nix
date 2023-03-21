@@ -33,6 +33,7 @@
                    pkgs.github-cli
                    #pkgs.babashka
                    pkgs.kubectl
+                   pkgs.istioctl
                    #pkgs.docker
                    ];
 

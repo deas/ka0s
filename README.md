@@ -2,10 +2,31 @@
 
 The primary goal of this project is to build a Chaos Engineering environment around the [LitmusChaos](https://litmuschaos.io/) platform. We try hard to provide a smooth development process including GitOps based deployment. Hence, we are leveraging `flux`, `terraform`, `nix` (using [devenv as a nix flake](https://devenv.sh/guides/using-with-flakes/)) and `kind` (maybe `k3s` soon). `nix` is no requirement, but strongly recommended as it should automatically provide you with the other tools - you should not have to worry about how to install things with your package manager.
 
-Experimentation is a natural element of Chaos Engineering. However, it should be just as natural in Software Development in general. That is why you might encounter bits (such as knative) with no strong Chaos Engineering relationship in this repo. Those bits are meant to be optional.
+If you just want to kick the Chaos the tires quickly, or if you want to build a long lasting Chaos environment : This might be a place to start.
+
+Experimentation is a natural element of Chaos Engineering. However, it should be just as natural in Software Development in general. That is why you might encounter bits (such as Knative) with no strong Chaos Engineering relationship in this repo. Those are meant to be optional.
+
+The default `localhost` cluster environment has very few requirements. It should work on many types of clusters. However, it is optimized to work with just enough resources to run the whole Chaos Stack and the resilient Sock Shop. 
+
+Various things I built upon had minor issues (mostly because there where outdated). At this time, the "fixes" are here because I wanted to move on quickly. Would be happy to contribute back. 
 
 This repo is derived from [flux-conductr](https://github.com/deas/flux-conductr). Look at that, if you are after a similar experience, focused on `flux` specifically.
 
+## Features
+- [LitmusChaos](https://litmuschaos.io/) platform
+- This repo acts as a ChaosHub
+- We serve the [Sock Shop Microservices Demo Application](https://microservices-demo.github.io/) as a scenario (defaulting to `containerd` experiments)
+- Prometheus Stack including Grafana provisioned for the Sock Shop Appliation
+- Loki
+- Istio Eventing/Serving
+- Knative
+- [Locust](https://locust.io/) load testing (supporting the UI)
+- Portal API usage examples
+- Support for deployment in proxy/custom CA environments
+- `flux`-/`terraform` Deployment
+- `nix` Dev Experience
+
+## Bootrapping
 Even though, we am trying to cover most things declaratively, some random bits may be covered by `make` targets. Simply calling the default target:
 
 ```sh
@@ -15,7 +36,6 @@ should output help hinting at what is covered.
 
 You may also want to disable github actions to start.
 
-## Bootrapping
 Optional: Generate ssh deployent keys and add public key to your repo
 
 ```sh
@@ -69,21 +89,42 @@ The `terraform` module provides a mechanism to patch the `coredns` `ConfigMap`. 
 
 I use `mitmproxy` locally to try things out.
 
-## Known Issues
-- knative challenging (Some bits need `kustomize.toolkit.fluxcd.io/substitute: disabled` in our context, other things need tweaks to upstream yaml to play with GitOps "... configured")
+## Misc
+### Autentication
+Grafana : `admin` / `prom-operator`.
+Litmus : `admin` / `litmus`.
 
 ## TODO
 - There are TODO tags in the code
+- Istio/Sock-Shop Dashboads
+- This repo can act as a ChaosHub - add it during setup
 - Add first class support for `mitmproxy` (ship deployment)
 - Add first class support for remote agent?
-- Leverage prometheus properly
-- Add GitOps experiments
+- Try GitOps scenarios?
+- Add this repo (as branch here - just like `gh_pages`?)
 - Manifests Naming
-- Split up `tf` module?
-- Fix annoying terraform plan ` yaml_incluster `
+- Fix annoying terraform plan ` yaml_incluster`
+- Add knative-serving/eventing/dns (using `nip.io`?)
+- Leverage `litmusctl`
+- How do we manage litmus projects (using ui?)?
+- Add mongodb/prometheus convenience (e.g. auth) targets to `Makefile`
+- Test drive 3.0-beta
+- Introduce kubeconfig module so we don't rely on environment w/o `kind`
+- `disk-fill` does not yet play with containerd
+- Implement weak-sock-shop
+- Catchup scheduled sock-shop workflow
+- Try Prometheus alerts
 
-## Know Issues
+## Observability
+- Add loki w [minIO](https://github.com/minio/minio/tree/master/helm/minio)
+- http://prometheus.monitoring.svc.cluster.local:9090 
+- [`monitoring: true`](https://github.com/litmuschaos/litmus/blob/master/demo/sample-applications/sock-shop/chaos/orders/orders-memory-hog.yaml#L15)? Explain does not show a lot
+
+## Known Issues
+- Some experiments from `litmus-go` appear to rely on `/var/run/docker.sock` which does not exist with containerd based environments ([see](https://docs.litmuschaos.io/docs/troubleshooting))
 - Knative deployment straight from github deployment not possible
+- knative challenging (Some bits need `kustomize.toolkit.fluxcd.io/substitute: disabled` in our context, other things need tweaks to upstream yaml to play with GitOps "... configured")
+- Istio Ingress appears to have an image pulling issue, so it takes a while to come up
 
 ## Misc/Random Bits
 - https://istio.io/latest/docs/setup/install/helm
@@ -92,3 +133,4 @@ I use `mitmproxy` locally to try things out.
 - Deploy knative straight from github? like flux-monitoring.yaml?
 - [Running Knative with Istio in a Kind Cluster (old!)](https://www.arthurkoziel.com/running-knative-with-istio-in-kind/)
 - [Install Knative using quickstart](https://knative.dev/docs/getting-started/quickstart-install/)
+

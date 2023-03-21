@@ -50,6 +50,19 @@ patch-litmus-ca-certs: ## Patch litmus ca certs
 patch-litmus-proxy-env: ## Patch litmus proxy env
 	$(KUBECTL_PATCH) deployment $(LITMUS_SERVER_DEPLOYMENT) --patch-file $(PATCH_LITMUS_SERVER_PROXY)
 
+.PHONY: create-locust-configmap
+create-locust-configmap: ## Create locust ConfigMap
+	@$(KUBECTL) -n loadtest create configmap locust --from-file=locustfile.py=./app-manifest/locustfile.py -o yaml --dry-run=client
+
+.PHONY: create-dashboard-configmaps
+create-dashboard-configmaps: ## Create dashbaord ConfigMaps
+#	$(KUBECTL) -n monitoring create configmap dashboards-istio --from-file=./infrastructure/lib/observability/dashboards/istio -o yaml --dry-run=client > ./infrastructure/lib/observability/configmap-dashboards-istio.yaml
+	$(KUBECTL) -n monitoring create configmap dashboards-sock-shop --from-file=./infrastructure/lib/observability/dashboards/sock-shop -o yaml --dry-run=client > ./infrastructure/lib/observability/configmap-dashboards-sock-shop.yaml
+	@echo
+	@echo "Make sure to add label for grafana sidecar"
+	@echo
+
+
 .PHONY: fmt
 fmt: ## Format
 	terraform fmt --check --recursive

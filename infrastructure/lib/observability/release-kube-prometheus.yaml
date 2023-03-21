@@ -1,0 +1,141 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: kube-prometheus-stack
+  namespace: monitoring
+spec:
+  releaseName: prometheus
+  chart:
+    spec:
+      chart: kube-prometheus-stack
+      sourceRef:
+        kind: HelmRepository
+        name: prometheus-community
+        namespace: flux-system
+      version: "45.7.1"
+  interval: 5m
+  install:
+    remediation:
+      retries: 3
+  values:
+    defaultRules:
+      create: true
+      rules:
+        alertmanager: false # true
+        # etcd: true
+        # configReloaders: true
+        # general: true
+        # k8s: true
+        # kubeApiserverAvailability: true
+        # kubeApiserverBurnrate: true
+        # kubeApiserverHistogram: true
+        # kubeApiserverSlos: true
+        # kubeControllerManager: true
+        # kubelet: true
+        # kubeProxy: true
+        # kubePrometheusGeneral: true
+        # kubePrometheusNodeRecording: true
+        # kubernetesApps: true
+        # kubernetesResources: true
+        # kubernetesStorage: true
+        # kubernetesSystem: true
+        # kubeSchedulerAlerting: true
+        # kubeSchedulerRecording: true
+        # kubeStateMetrics: true
+        # network: true
+        # node: true
+        # nodeExporterAlerting: true
+        # nodeExporterRecording: true
+        # prometheus: true
+        # prometheusOperator: true
+    
+    alertmanager:
+      enabled: false
+    
+    ## Using default values from https://github.com/grafana/helm-charts/blob/main/charts/grafana/values.yaml
+    ##
+    grafana:
+      enabled: true
+    
+      sidecar:
+        dashboards:
+          enabled: true
+          label: grafana_dashboard
+          labelValue: "1"
+    
+          ## Annotations for Grafana dashboard configmaps
+          ##
+          annotations: {}
+          multicluster:
+            global:
+              enabled: false
+            etcd:
+              enabled: false
+          provider:
+            allowUiUpdates: false
+        datasources:
+          enabled: true
+          defaultDatasourceEnabled: true
+          isDefaultDatasource: true
+    
+          uid: prometheus
+    
+          ## URL of prometheus datasource
+          ##
+          # url: http://prometheus-stack-prometheus:9090/
+    
+          # If not defined, will use prometheus.prometheusSpec.scrapeInterval or its default
+          # defaultDatasourceScrapeInterval: 15s
+    
+          ## Annotations for Grafana datasource configmaps
+          ##
+          annotations: {}
+    
+          ## Create datasource for each Pod of Prometheus StatefulSet;
+          ## this uses headless service `prometheus-operated` which is
+          ## created by Prometheus Operator
+          ## ref: https://github.com/prometheus-operator/prometheus-operator/blob/0fee93e12dc7c2ea1218f19ae25ec6b893460590/pkg/prometheus/statefulset.go#L255-L286
+          createPrometheusReplicasDatasources: false
+          label: grafana_datasource
+          labelValue: "1"
+    
+          ## Field with internal link pointing to existing data source in Grafana.
+          ## Can be provisioned via additionalDataSources
+          exemplarTraceIdDestinations: {}
+            # datasourceUid: Jaeger
+            # traceIdLabelName: trace_id
+    
+      extraConfigmapMounts: []
+      # - name: certs-configmap
+      #   mountPath: /etc/grafana/ssl/
+      #   configMap: certs-configmap
+      #   readOnly: true
+    
+      deleteDatasources: []
+      # - name: example-datasource
+      #   orgId: 1
+    
+      ## Configure additional grafana datasources (passed through tpl)
+      ## ref: http://docs.grafana.org/administration/provisioning/#datasources
+      additionalDataSources: # []
+      - name: Loki
+        type: loki
+        access: proxy
+        url: http://loki:3100
+        jsonData:
+          maxLines: 1000
+      # - name: prometheus-sample
+      #   access: proxy
+      #   basicAuth: true
+      #   basicAuthPassword: pass
+      #   basicAuthUser: daco
+      #   editable: false
+      #   jsonData:
+      #       tlsSkipVerify: true
+      #   orgId: 1
+      #   type: prometheus
+      #   url: https://{{ printf "%s-prometheus.svc" .Release.Name }}:9090
+      #   version: 1
+      service:
+        type: LoadBalancer
+

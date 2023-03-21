@@ -8,3 +8,6 @@ resources:
   - flux.yaml
   - istio.yaml
   - litmuschaos.yaml
+  - minio.yaml
+  - grafana.yaml
+  - prometheus-community.yaml

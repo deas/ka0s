@@ -1,0 +1,67 @@
+apiVersion: litmuschaos.io/v1alpha1
+kind: ChaosEngine
+metadata:
+  name: pod-cpu-hog-chaos
+  namespace: litmus # {{workflow.parameters.adminModeNamespace}}
+  labels:
+    context: sock-shop_carts # "{{workflow.parameters.appNamespace}}_carts"
+spec:
+  appinfo:
+    appns: 'sock-shop'
+    applabel: 'name=carts'
+    appkind: 'deployment'
+  jobCleanUpPolicy: retain
+  engineState: 'active'
+  chaosServiceAccount: litmus-admin
+  experiments:
+    - name: pod-cpu-hog
+      spec:
+        probe:
+        - name: "check-frontend-access-url"
+          type: "httpProbe"
+          httpProbe/inputs:
+            url: "http://front-end.sock-shop.svc.cluster.local:80"
+            insecureSkipVerify: false
+            # responseTimeout: 100
+            method:
+              get:
+                criteria: "=="
+                responseCode: "200"
+          mode: "Continuous"
+          runProperties:
+            probeTimeout: 1000
+            interval: 1
+            retry: 1
+          # runProperties:
+          #   probeTimeout: 500
+          #   interval: 1
+          #   retry: 2
+          #   probePollingInterval: 1
+        # - name: "check-benchmark"
+        #   type: "cmdProbe"
+        #   cmdProbe/inputs:
+        #     command: "curl http://qps-test.sock-shop.svc.cluster.local"
+        #     comparator:
+        #       type: "int" # supports: string, int, float
+        #       criteria: ">=" #supports >=,<=,>,<,==,!= for int and contains,equal,notEqual,matches,notMatches for string values
+        #       value: "100"
+        #   mode: "Edge"
+        #   runProperties:
+        #     probeTimeout: 500
+        #     interval: 1
+        #     retry: 2
+        #     initialDelaySeconds: 10
+        components:
+          env:
+            #number of cpu cores to be consumed
+            #verify the resources the app has been launched with
+            - name: CONTAINER_RUNTIME
+              value: 'containerd'
+            - name: SOCKET_PATH
+              value: '/var/run/containerd/containerd.sock'
+            - name: CPU_CORES
+              value: '1'
+            - name: TOTAL_CHAOS_DURATION
+              value: '30' # in seconds
+            - name: CHAOS_KILL_COMMAND
+              value: "kill -9 $(ps afx | grep \"[md5sum] /dev/zero\" | awk '{print$1}' | tr '\n' ' ')"

@@ -1,0 +1,127 @@
+# https://docs.locust.io/en/stable/running-in-docker.html
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: loadtest
+---
+# User 'system:serviceaccount:litmus:argo-chaos' cannot get resource 'rolebindings' in API group 'rbac.authorization.k8s.io' in the namespace 'sock-shop'
+# apiVersion: rbac.authorization.k8s.io/v1
+# kind: Role
+# metadata:
+#   name: list-deployments
+#   namespace: sock-shop
+# rules:
+# - apiGroups: ["apps"]
+#   resources: ["deployments"]
+#   verbs: ["list"]
+# ---
+# apiVersion: rbac.authorization.k8s.io/v1
+# kind: RoleBinding
+# metadata:
+#   name: list-deployments-binding
+#   namespace: sock-shop
+# subjects:
+# - kind: ServiceAccount
+#   name: default
+#   namespace: loadtest
+# roleRef:
+#   kind: Role
+#   name: list-deployments
+#   apiGroup: rbac.authorization.k8s.io
+# ---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: load-test
+  labels:
+    app: loadtest
+    name: load-test
+  namespace: loadtest
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: loadtest
+  template:
+    metadata:
+      labels:
+        app: loadtest
+        name: load-test
+    spec:
+      #containers:
+      #- name: load-test
+      #  image: weaveworksdemos/load-test:0.1.1
+      #  command: ["/bin/sh"]
+      #  # locust --host http://172.18.255.202 -f ./locustfile.py --headless
+      #  args: ["-c", "while true; do locust --host http://front-end.sock-shop.svc.cluster.local -f /config/locustfile.py --clients 5 --hatch-rate 5 --num-request 100 --no-web; done"]
+      nodeSelector:
+        kubernetes.io/os: linux
+      # TODO: Init container should do the waiting
+      # Error from server (Forbidden): deployments.apps is forbidden: User "system:serviceaccount:loadtest:default" cannot list resource "deployments" in API group "apps" in the namespace "sock-shop"
+
+      # initContainers:
+      # - name: wait-for-sock-shop
+      #   image: litmuschaos/k8s:latest
+      #   command: [sh, -c]
+      #   args:
+      #     - "kubectl -n sock-shop wait --timeout=360s --for=condition=available deployment -l name=carts &&
+      #        kubectl -n sock-shop wait --timeout=360s --for=condition=available deployment -l name=catalogue &&
+      #        kubectl -n sock-shop wait --timeout=360s --for=condition=available deployment -l name=front-end &&
+      #        kubectl -n sock-shop wait --timeout=360s --for=condition=available deployment -l name=orders &&
+      #        kubectl -n sock-shop wait --timeout=360s --for=condition=available deployment -l name=payment &&
+      #        kubectl -n sock-shop wait --timeout=360s --for=condition=available deployment -l name=qps-test &&
+      #        kubectl -n sock-shop wait --timeout=360s --for=condition=available deployment -l name=shipping &&
+      #        kubectl -n sock-shop wait --timeout=360s --for=condition=available deployment -l name=user"
+      containers:
+      - name: load-test
+        image: locustio/locust:2.5.1
+        args: [ "-f", "/config/locustfile.py", "--host", "http://front-end.sock-shop.svc.cluster.local", "--headless" ]
+        # --master -H http://master:8089
+        # command: ["/bin/sh"]
+        # locust --host http://172.18.255.202 -f ./locustfile.py --headless
+        # args: ["-c", "while true; do locust --host http://front-end.sock-shop.svc.cluster.local -f /config/locustfile.py --clients 5 --hatch-rate 5 --num-request 100 --no-web; done"]
+        volumeMounts:
+        - mountPath: /config
+          name: locust
+      volumes:
+      - name: locust
+        configMap:
+          name: locust
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: locust
+  namespace: loadtest
+spec:
+  ports:
+  - port: 8089
+    protocol: TCP
+    targetPort: 8089
+  selector:
+    app: loadtest
+    # app.kubernetes.io/component: locust
+  #sessionAffinity: None
+  type: LoadBalancer
+---
+apiVersion: v1
+data:
+  locustfile.py: "# locust --host http://172.18.255.202 -f ./locustfile.py --headless\n#
+    locust --host http://front-end.sock-shop.svc.cluster.local -f /config/locustfile.py
+    --clients 5 --hatch-rate 5 --num-request 100 --no-web\n\nimport base64\n\nfrom
+    locust import HttpUser, TaskSet, task, constant\nfrom random import randint, choice\n\n\nclass
+    WebTasks(TaskSet):\n\n    @task\n    def load(self):\n        base64string = base64.b64encode(bytes('user:password',
+    'utf-8')).decode(\"ascii\")\n        catalogue = self.client.get(\"/catalogue\").json()\n
+    \       category_item = choice(catalogue)\n        item_id = category_item[\"id\"]\n\n
+    \       self.client.get(\"/\")\n        self.client.get(\"/login\", headers={\"Authorization\":\"Basic
+    %s\" % base64string})\n        self.client.get(\"/category.html\")\n        self.client.get(\"/detail.html?id={}\".format(item_id))\n
+    \       self.client.delete(\"/cart\")\n        self.client.post(\"/cart\", json={\"id\":
+    item_id, \"quantity\": 1})\n        self.client.get(\"/basket.html\")\n        #
+    self.client.post(\"/orders\") # TODO: Roughly 10% errors?\n\n\nclass Web(HttpUser):\n
+    \   tasks = {WebTasks:2}\n    # wait_time = constant(5)    \n    # task_set =
+    WebTasks\n    min_wait = 0\n    max_wait = 0\n    #@task\n    #def my_task(self):\n
+    \   #    pass"
+kind: ConfigMap
+metadata:
+  name: locust
+  namespace: loadtest

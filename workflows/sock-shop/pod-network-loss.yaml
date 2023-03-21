@@ -1,0 +1,68 @@
+apiVersion: litmuschaos.io/v1alpha1
+kind: ChaosEngine
+metadata:
+  name: pod-network-loss-chaos
+  namespace: litmus # {{workflow.parameters.adminModeNamespace}}
+  labels:
+    context: sock-shop # "{{workflow.parameters.appNamespace}}_user-db"
+spec:
+  appinfo:
+    appns: 'sock-shop'
+    applabel: 'name=user-db'
+    appkind: 'statefulset'
+  jobCleanUpPolicy: retain
+  engineState: 'active'
+  chaosServiceAccount: litmus-admin
+  components:
+    runner:
+      imagePullPolicy: Always
+  experiments:
+    - name: pod-network-loss
+      spec:
+        probe:
+        - name: "check-cards-access-url"
+          type: "httpProbe"
+          httpProbe/inputs:
+            url: "http://front-end.sock-shop.svc.cluster.local:80/cards"
+            insecureSkipVerify: false
+            # responseTimeout: 100
+            method:
+              get:
+                criteria: "=="
+                responseCode: "200"
+          mode: "Continuous"
+          runProperties:
+            probeTimeout: 1000
+            interval: 1
+            retry: 1
+          # runProperties:
+          #   probeTimeout: 500
+          #   interval: 12
+          #   retry: 3
+          #   probePollingInterval: 1
+        # - name: "check-benchmark"
+        #   type: "cmdProbe"
+        #   cmdProbe/inputs:
+        #     command: "curl http://qps-test.sock-shop.svc.cluster.local"
+        #     comparator:
+        #       type: "int" # supports: string, int, float
+        #       criteria: ">=" #supports >=,<=,>,<,==,!= for int and contains,equal,notEqual,matches,notMatches for string values
+        #       value: "100"
+        #   mode: "Edge"
+        #   runProperties:
+        #     probeTimeout: 500
+        #     interval: 1
+        #     retry: 2
+        #     initialDelaySeconds: 2
+        components:
+          env:
+            - name: CONTAINER_RUNTIME
+              value: 'containerd'
+            - name: SOCKET_PATH
+              value: '/var/run/containerd/containerd.sock'
+            - name: TOTAL_CHAOS_DURATION
+              value: '30' 
+            - name: NETWORK_INTERFACE
+              value: 'eth0'
+            - name: NETWORK_PACKET_LOSS_PERCENTAGE
+              value: '100'

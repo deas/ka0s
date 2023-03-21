@@ -88,7 +88,8 @@ apply: ## Terraform apply
 quick-destroy: ## Quick destruction
 	docker stop ka0s-control-plane || true
 	docker rm ka0s-control-plane || true
-	rm -rf 	terraform.tfstate*
+# rm -rf 	terraform.tfstate*
+	terraform state list | cut -f 1 -d '[' | sort | uniq | xargs terraform state rm
 
 .PHONY: open-app
 open-app: ## Open the application in your browser

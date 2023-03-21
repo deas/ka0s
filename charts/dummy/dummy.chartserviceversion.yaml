@@ -1,0 +1,31 @@
+apiVersion: litmuchaos.io/v1alpha1
+kind: ChartServiceVersion
+metadata:
+  createdAt: 2021-04-29T10:28:08Z
+  name: dummy
+  version: 0.1.0
+  annotations:
+    categories: generic
+    chartDescription: Dummy
+spec:
+  displayName: Dummy Chaos
+  categoryDescription: >
+    Dummy
+  experiments:
+    - dummy
+  keywords:
+    - dummy
+  maintainers: []
+  provider:
+    name: ChaosNative
+  links:
+    - name: Kubernetes Website
+      url: https://kubernetes.io
+    - name: Source Code
+      url: https://github.com/litmuschaos/litmus-go/tree/master/experiments/vmware
+    - name: Community Slack
+      url: https://app.slack.com/client/T09NY5SBT/CNXNB0ZTN
+  icon:
+    - url: 
+      mediatype: 
+  # chaosexpcrdlink: https://raw.githubusercontent.com/litmuschaos/chaos-charts/master/charts/generic/experiments.yaml

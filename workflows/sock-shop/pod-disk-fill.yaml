@@ -1,0 +1,71 @@
+apiVersion: litmuschaos.io/v1alpha1
+kind: ChaosEngine
+metadata:
+  name: catalogue-disk-fill
+  namespace: litmus # {{workflow.parameters.adminModeNamespace}}
+  labels:
+    context: sock-shop_catalogue-db # "{{workflow.parameters.appNamespace}}_catalogue-db"
+spec:
+  appinfo:
+    appns: 'sock-shop'
+    applabel: 'name=catalogue-db'
+    appkind: 'statefulset'
+  engineState: 'active'
+  chaosServiceAccount: litmus-admin
+  jobCleanUpPolicy: 'retain'
+  components:
+    runner:
+      imagePullPolicy: Always
+  experiments:
+    - name: disk-fill
+      spec:
+        probe:
+        - name: "check-catalogue-db-cr-status"
+          type: "k8sProbe"
+          k8sProbe/inputs:
+            group: ""
+            version: "v1"
+            resource: "pods"
+            namespace: "sock-shop"
+            fieldSelector: "status.phase=Running"
+            labelSelector: "name=catalogue-db"
+            operation: "present"
+          mode: "Continuous"
+          runProperties:
+            probeTimeout: 1000
+            interval: 1
+            retry: 1
+          #runProperties:
+          #  probeTimeout: 500
+          #  interval: 1
+          #  retry: 1
+          #  probePollingInterval: 1
+        #- name: "check-benchmark"
+        #  type: "cmdProbe"
+        #  cmdProbe/inputs:
+        #    command: "curl http://qps-test.sock-shop.svc.cluster.local:80"
+        #    comparator:
+        #      type: "int" # supports: string, int, float
+        #      criteria: ">=" #supports >=,<=,>,<,==,!= for int and contains,equal,notEqual,matches,notMatches for string values
+        #      value: "100"
+        #  mode: "Edge"
+        #  runProperties:
+        #    probeTimeout: 500
+        #    interval: 1
+        #    retry: 2
+        #    initialDelaySeconds: 1
+        components:
+          env:
+            - name: CONTAINER_RUNTIME
+              value: 'containerd'
+            # TODO: CONTAINER_PATH (/var/lib/docker/containers) not honoured by generic/disk-fill/environment/environment.go, implemenation for containerd not clear
+            #- name: CONTAINER_PATH
+            #  value: /var/lib/docker/containers
+            - name: SOCKET_PATH
+              value: '/var/run/containerd/containerd.sock'
+            - name: FILL_PERCENTAGE
+              value: '100'
+            - name: TARGET_CONTAINER
+              value: ''
+            - name: TOTAL_CHAOS_DURATION
+              value: '30'                     
