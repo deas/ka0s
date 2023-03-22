@@ -50,8 +50,11 @@ spec:
         image: litmuschaos/k8s:latest
         command: [sh, -c]
         args:
-          - "kubectl apply -f https://raw.githubusercontent.com/deas/ka0s/wip/app-manifest/resilient-sock-shop.yaml"
-      # kubectl apply -f https://raw.githubusercontent.com/deas/ka0s/wip/app-manifest/resilient-sock-shop.yaml
+          - >
+            KUBERNETES_SERVICE_HOST=kubernetes.default.svc.cluster.local
+            _HTTPS_PROXY=http://proxy.local:3128
+            _NO_PROXY=.cluster.local
+            kubectl apply -f https://raw.githubusercontent.com/deas/ka0s/wip/app-manifest/resilient-sock-shop.yaml
       #container:
       #  image: litmuschaos/litmus-app-deployer:latest
       #  args: ["-namespace=sock-shop","-typeName=resilient","-operation=apply","-timeout=400", "-app=sock-shop","-scope=cluster"] #for weak provide type flagName as resilient(-typeName=weak)
@@ -61,7 +64,11 @@ spec:
         image: litmuschaos/k8s:latest
         command: [sh, -c]
         args:
-          - "kubectl apply -f https://raw.githubusercontent.com/deas/ka0s/wip/app-manifest/resilient-sock-shop.yaml"
+          - >
+            KUBERNETES_SERVICE_HOST=kubernetes.default.svc.cluster.local
+            _HTTPS_PROXY=http://proxy.local:3128
+            _NO_PROXY=.cluster.local
+            kubectl apply -f https://raw.githubusercontent.com/deas/ka0s/wip/app-manifest/resilient-sock-shop.yaml
         #args:
         #  - "kubectl apply -f https://hub.litmuschaos.io/api/chaos/2.14.0?file=charts/generic/experiments.yaml -n
         #    {{workflow.parameters.adminModeNamespace}} ; sleep 30"
@@ -442,7 +449,11 @@ spec:
         image: litmuschaos/k8s:latest
         command: [sh, -c]
         args:
-          - "kubectl delete -f https://raw.githubusercontent.com/deas/ka0s/wip/app-manifest/resilient-sock-shop.yaml"
+          - >
+            KUBERNETES_SERVICE_HOST=kubernetes.default.svc.cluster.local
+            _HTTPS_PROXY=http://proxy.local:3128
+            _NO_PROXY=.cluster.local
+            kubectl delete -f https://raw.githubusercontent.com/deas/ka0s/wip/app-manifest/resilient-sock-shop.yaml
       #container:
       #  image: litmuschaos/litmus-app-deployer:latest
       #  args: ["-namespace=sock-shop","-typeName=resilient","-operation=delete", "-app=sock-shop"]
@@ -451,7 +462,11 @@ spec:
         image: litmuschaos/k8s:latest
         command: [sh, -c]
         args:
-          - "kubectl apply -f https://raw.githubusercontent.com/deas/ka0s/wip/app-manifest/loadtest.yaml"
+          - >
+            KUBERNETES_SERVICE_HOST=kubernetes.default.svc.cluster.local
+            _HTTPS_PROXY=http://proxy.local:3128
+            _NO_PROXY=.cluster.local
+            kubectl apply -f https://raw.githubusercontent.com/deas/ka0s/wip/app-manifest/loadtest.yaml
       #  image: litmuschaos/litmus-app-deployer:latest
       #  args: ["-namespace=loadtest", "-app=loadtest"]
 
@@ -460,7 +475,11 @@ spec:
         image: litmuschaos/k8s:latest
         command: [sh, -c]
         args:
-          - "kubectl delete -f https://raw.githubusercontent.com/deas/ka0s/wip/app-manifest/loadtest.yaml"
+         - >
+          KUBERNETES_SERVICE_HOST=kubernetes.default.svc.cluster.local
+          _HTTPS_PROXY=http://proxy.local:3128
+          _NO_PROXY=.cluster.local
+          kubectl delete -f https://raw.githubusercontent.com/deas/ka0s/wip/app-manifest/loadtest.yaml
         # image: litmuschaos/litmus-app-deployer:latest
         # args: ["-namespace=loadtest","-operation=delete", "-app=loadtest"]
     

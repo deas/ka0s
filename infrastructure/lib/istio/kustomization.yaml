@@ -3,5 +3,7 @@ kind: Kustomization
 namespace: istio-system
 resources:
   - namespace.yaml
-  - release-base.yaml
-  - release-istiod.yaml
+  # - release-base.yaml
+  # - release-istiod.yaml
+  - manifest-istio-base-403-workaround.yaml
+  - manifest-istiod-403-workaround.yaml

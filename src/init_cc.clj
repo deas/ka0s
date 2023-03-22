@@ -12,7 +12,7 @@
   (timbre/merge-config!
    {:min-level (-> cfg/common-defaults :log-level keyword)})
   (-> nil)
-      println))
+      println)
 
 ;; TODO: No *file* in k8s job
 (when (= *file* (System/getProperty "babashka.file"))

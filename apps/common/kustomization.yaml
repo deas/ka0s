@@ -3,5 +3,5 @@ kind: Kustomization
 resources:
   - litmus
   # - flux-system
-  # - knative
-  # - monitoring
+  - knative
+  - monitoring
