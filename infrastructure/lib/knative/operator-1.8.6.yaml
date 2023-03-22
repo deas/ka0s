@@ -1,5 +1,3 @@
-# Not using `kustomize.toolkit.fluxcd.io/substitute: disabled` in this v1.9.2 thing
-#
 # Copyright 2022 The Tekton Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,8 +19,8 @@ metadata:
   namespace: default
   labels:
     app.kubernetes.io/component: webhook
-    operator.knative.dev/release: "v1.9.2"
-    app.kubernetes.io/version: "1.9.2"
+    operator.knative.dev/release: "v1.8.6"
+    app.kubernetes.io/version: "1.8.6"
     app.kubernetes.io/part-of: knative-operator
 # The data is populated at install time.
 
@@ -47,9 +45,9 @@ metadata:
   name: operator-webhook
   namespace: default
   labels:
-    operator.knative.dev/release: "v1.9.2"
+    operator.knative.dev/release: "v1.8.6"
     app.kubernetes.io/component: operator-webhook
-    app.kubernetes.io/version: "1.9.2"
+    app.kubernetes.io/version: "1.8.6"
     app.kubernetes.io/name: knative-operator
 spec:
   selector:
@@ -64,9 +62,9 @@ spec:
       labels:
         app: operator-webhook
         role: operator-webhook
-        operator.knative.dev/release: "v1.9.2"
+        operator.knative.dev/release: "v1.8.6"
         app.kubernetes.io/component: operator-webhook
-        app.kubernetes.io/version: "1.9.2"
+        app.kubernetes.io/version: "1.8.6"
         app.kubernetes.io/name: knative-operator
     spec:
       # To avoid node becoming SPOF, spread our replicas to different nodes.
@@ -84,7 +82,7 @@ spec:
         - name: operator-webhook
           # This is the Go import path for the binary that is containerized
           # and substituted here.
-          image: gcr.io/knative-releases/knative.dev/operator/cmd/webhook@sha256:62f35fcf9f7dbe7fb8a6e64542bd1b8440eff4da33a1523812914a652b61c34b
+          image: gcr.io/knative-releases/knative.dev/operator/cmd/webhook@sha256:fc0f2e00ef9671e13c4a98d87b06504672b0fee19cc9cfb2037516dc667a72d9
           resources:
             requests:
               cpu: 100m
@@ -167,9 +165,9 @@ kind: Service
 metadata:
   labels:
     role: operator-webhook
-    operator.knative.dev/release: "v1.9.2"
+    operator.knative.dev/release: "v1.8.6"
     app.kubernetes.io/component: operator-webhook
-    app.kubernetes.io/version: "1.9.2"
+    app.kubernetes.io/version: "1.8.6"
     app.kubernetes.io/name: knative-operator
   name: operator-webhook
   namespace: default
@@ -208,8 +206,8 @@ kind: CustomResourceDefinition
 metadata:
   name: knativeeventings.operator.knative.dev
   labels:
-    operator.knative.dev/release: "v1.9.2"
-    app.kubernetes.io/version: "1.9.2"
+    operator.knative.dev/release: "v1.8.6"
+    app.kubernetes.io/version: "1.8.6"
     app.kubernetes.io/part-of: knative-operator
 spec:
   group: operator.knative.dev
@@ -473,88 +471,6 @@ spec:
                             value:
                               description: Value is the taint value the toleration matches to. If the operator is Exists, the value should be empty, otherwise just a regular string.
                               type: string
-                          type: object
-                        type: array
-                      topologySpreadConstraints:
-                        description: If specified, the pod's topology spread constraints.
-                        items:
-                          description: TopologySpreadConstraint specifies how to spread matching pods among the given topology.
-                          properties:
-                            labelSelector:
-                              description: LabelSelector is used to find matching pods. Pods that match this label selector are counted to determine the number of pods in their corresponding topology domain.
-                              properties:
-                                matchExpressions:
-                                  description: matchExpressions is a list of label selector requirements. The requirements are ANDed.
-                                  items:
-                                    description: A label selector requirement is a selector that contains values, a key, and an operator that relates the key and values.
-                                    properties:
-                                      key:
-                                        description: key is the label key that the selector applies to.
-                                        type: string
-                                      operator:
-                                        description: operator represents a key's relationship to a set of values. Valid operators are In, NotIn, Exists and DoesNotExist.
-                                        type: string
-                                      values:
-                                        description: values is an array of string values. If the operator is In or NotIn, the values array must be non-empty. If the operator is Exists or DoesNotExist, the values array must be empty. This array is replaced during a strategic merge patch.
-                                        items:
-                                          type: string
-                                        type: array
-                                    required:
-                                      - key
-                                      - operator
-                                    type: object
-                                  type: array
-                                matchLabels:
-                                  additionalProperties:
-                                    type: string
-                                  description: matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels map is equivalent to an element of matchExpressions, whose key field is "key", the operator is "In", and the values array contains only "value". The requirements are ANDed.
-                                  type: object
-                              type: object
-                            maxSkew:
-                              description: 'MaxSkew describes the degree to which pods may be unevenly distributed. It''s the maximum permitted difference between the number of matching pods in any two topology domains of a given topology type. For example, in a 3-zone cluster, MaxSkew is set to 1, and pods with the same labelSelector spread as 1/1/0: | zone1 | zone2 | zone3 | |   P   |   P   |       | - if MaxSkew is 1, incoming pod can only be scheduled to zone3 to become 1/1/1; scheduling it onto zone1(zone2) would make the ActualSkew(2-0) on zone1(zone2) violate MaxSkew(1). - if MaxSkew is 2, incoming pod can be scheduled onto any zone. It''s a required field. Default value is 1 and 0 is not allowed.'
-                              format: int32
-                              type: integer
-                            topologyKey:
-                              description: TopologyKey is the key of node labels. Nodes that have a label with this key and identical values are considered to be in the same topology. We consider each <key, value> as a "bucket", and try to put balanced number of pods into each bucket. It's a required field.
-                              type: string
-                            whenUnsatisfiable:
-                              description: 'WhenUnsatisfiable indicates how to deal with a pod if it doesn''t satisfy the spread constraint. - DoNotSchedule (default) tells the scheduler not to schedule it - ScheduleAnyway tells the scheduler to still schedule it It''s considered as "Unsatisfiable" if and only if placing incoming pod on any topology violates "MaxSkew". For example, in a 3-zone cluster, MaxSkew is set to 1, and pods with the same labelSelector spread as 3/1/1: | zone1 | zone2 | zone3 | | P P P |   P   |   P   | If WhenUnsatisfiable is set to DoNotSchedule, incoming pod can only be scheduled to zone2(zone3) to become 3/2/1(3/1/2) as ActualSkew(2-1) on zone2(zone3) satisfies MaxSkew(1). In other words, the cluster can still be imbalanced, but scheduler won''t make it *more* imbalanced. It''s a required field.'
-                              type: string
-                          required:
-                            - maxSkew
-                            - topologyKey
-                            - whenUnsatisfiable
-                          type: object
-                        type: array
-                      version:
-                        description: Version the cluster should be on.
-                        type: string
-                      volumeMounts:
-                        description: VolumeMounts allows configuration of additional VolumeMounts on the output StatefulSet definition. VolumeMounts specified will be appended to other VolumeMounts in the alertmanager container, that are generated as a result of StorageSpec objects.
-                        items:
-                          description: VolumeMount describes a mounting of a Volume within a container.
-                          properties:
-                            mountPath:
-                              description: Path within the container at which the volume should be mounted.  Must not contain ':'.
-                              type: string
-                            mountPropagation:
-                              description: mountPropagation determines how mounts are propagated from the host to container and the other way around. When not set, MountPropagationNone is used. This field is beta in 1.10.
-                              type: string
-                            name:
-                              description: This must match the Name of a Volume.
-                              type: string
-                            readOnly:
-                              description: Mounted read-only if true, read-write otherwise (false or unspecified). Defaults to false.
-                              type: boolean
-                            subPath:
-                              description: Path within the volume from which the container's volume should be mounted. Defaults to "" (volume's root).
-                              type: string
-                            subPathExpr:
-                              description: Expanded path within the volume from which the container's volume should be mounted. Behaves similarly to SubPath but environment variable references $(VAR_NAME) are expanded using the container's environment. Defaults to "" (volume's root). SubPathExpr and SubPath are mutually exclusive.
-                              type: string
-                          required:
-                            - mountPath
-                            - name
                           type: object
                         type: array
                       affinity:
@@ -1138,57 +1054,6 @@ spec:
                             value:
                               description: Value is the taint value the toleration matches to. If the operator is Exists, the value should be empty, otherwise just a regular string.
                               type: string
-                          type: object
-                        type: array
-                      topologySpreadConstraints:
-                        description: If specified, the pod's topology spread constraints.
-                        items:
-                          description: TopologySpreadConstraint specifies how to spread matching pods among the given topology.
-                          properties:
-                            labelSelector:
-                              description: LabelSelector is used to find matching pods. Pods that match this label selector are counted to determine the number of pods in their corresponding topology domain.
-                              properties:
-                                matchExpressions:
-                                  description: matchExpressions is a list of label selector requirements. The requirements are ANDed.
-                                  items:
-                                    description: A label selector requirement is a selector that contains values, a key, and an operator that relates the key and values.
-                                    properties:
-                                      key:
-                                        description: key is the label key that the selector applies to.
-                                        type: string
-                                      operator:
-                                        description: operator represents a key's relationship to a set of values. Valid operators are In, NotIn, Exists and DoesNotExist.
-                                        type: string
-                                      values:
-                                        description: values is an array of string values. If the operator is In or NotIn, the values array must be non-empty. If the operator is Exists or DoesNotExist, the values array must be empty. This array is replaced during a strategic merge patch.
-                                        items:
-                                          type: string
-                                        type: array
-                                    required:
-                                      - key
-                                      - operator
-                                    type: object
-                                  type: array
-                                matchLabels:
-                                  additionalProperties:
-                                    type: string
-                                  description: matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels map is equivalent to an element of matchExpressions, whose key field is "key", the operator is "In", and the values array contains only "value". The requirements are ANDed.
-                                  type: object
-                              type: object
-                            maxSkew:
-                              description: 'MaxSkew describes the degree to which pods may be unevenly distributed. It''s the maximum permitted difference between the number of matching pods in any two topology domains of a given topology type. For example, in a 3-zone cluster, MaxSkew is set to 1, and pods with the same labelSelector spread as 1/1/0: | zone1 | zone2 | zone3 | |   P   |   P   |       | - if MaxSkew is 1, incoming pod can only be scheduled to zone3 to become 1/1/1; scheduling it onto zone1(zone2) would make the ActualSkew(2-0) on zone1(zone2) violate MaxSkew(1). - if MaxSkew is 2, incoming pod can be scheduled onto any zone. It''s a required field. Default value is 1 and 0 is not allowed.'
-                              format: int32
-                              type: integer
-                            topologyKey:
-                              description: TopologyKey is the key of node labels. Nodes that have a label with this key and identical values are considered to be in the same topology. We consider each <key, value> as a "bucket", and try to put balanced number of pods into each bucket. It's a required field.
-                              type: string
-                            whenUnsatisfiable:
-                              description: 'WhenUnsatisfiable indicates how to deal with a pod if it doesn''t satisfy the spread constraint. - DoNotSchedule (default) tells the scheduler not to schedule it - ScheduleAnyway tells the scheduler to still schedule it It''s considered as "Unsatisfiable" if and only if placing incoming pod on any topology violates "MaxSkew". For example, in a 3-zone cluster, MaxSkew is set to 1, and pods with the same labelSelector spread as 3/1/1: | zone1 | zone2 | zone3 | | P P P |   P   |   P   | If WhenUnsatisfiable is set to DoNotSchedule, incoming pod can only be scheduled to zone2(zone3) to become 3/2/1(3/1/2) as ActualSkew(2-1) on zone2(zone3) satisfies MaxSkew(1). In other words, the cluster can still be imbalanced, but scheduler won''t make it *more* imbalanced. It''s a required field.'
-                              type: string
-                          required:
-                            - maxSkew
-                            - topologyKey
-                            - whenUnsatisfiable
                           type: object
                         type: array
                       affinity:
@@ -1764,8 +1629,8 @@ kind: CustomResourceDefinition
 metadata:
   name: knativeservings.operator.knative.dev
   labels:
-    operator.knative.dev/release: "v1.9.2"
-    app.kubernetes.io/version: "1.9.2"
+    operator.knative.dev/release: "v1.8.6"
+    app.kubernetes.io/version: "1.8.6"
     app.kubernetes.io/part-of: knative-operator
 spec:
   group: operator.knative.dev
@@ -2040,88 +1905,6 @@ spec:
                             value:
                               description: Value is the taint value the toleration matches to. If the operator is Exists, the value should be empty, otherwise just a regular string.
                               type: string
-                          type: object
-                        type: array
-                      topologySpreadConstraints:
-                        description: If specified, the pod's topology spread constraints.
-                        items:
-                          description: TopologySpreadConstraint specifies how to spread matching pods among the given topology.
-                          properties:
-                            labelSelector:
-                              description: LabelSelector is used to find matching pods. Pods that match this label selector are counted to determine the number of pods in their corresponding topology domain.
-                              properties:
-                                matchExpressions:
-                                  description: matchExpressions is a list of label selector requirements. The requirements are ANDed.
-                                  items:
-                                    description: A label selector requirement is a selector that contains values, a key, and an operator that relates the key and values.
-                                    properties:
-                                      key:
-                                        description: key is the label key that the selector applies to.
-                                        type: string
-                                      operator:
-                                        description: operator represents a key's relationship to a set of values. Valid operators are In, NotIn, Exists and DoesNotExist.
-                                        type: string
-                                      values:
-                                        description: values is an array of string values. If the operator is In or NotIn, the values array must be non-empty. If the operator is Exists or DoesNotExist, the values array must be empty. This array is replaced during a strategic merge patch.
-                                        items:
-                                          type: string
-                                        type: array
-                                    required:
-                                      - key
-                                      - operator
-                                    type: object
-                                  type: array
-                                matchLabels:
-                                  additionalProperties:
-                                    type: string
-                                  description: matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels map is equivalent to an element of matchExpressions, whose key field is "key", the operator is "In", and the values array contains only "value". The requirements are ANDed.
-                                  type: object
-                              type: object
-                            maxSkew:
-                              description: 'MaxSkew describes the degree to which pods may be unevenly distributed. It''s the maximum permitted difference between the number of matching pods in any two topology domains of a given topology type. For example, in a 3-zone cluster, MaxSkew is set to 1, and pods with the same labelSelector spread as 1/1/0: | zone1 | zone2 | zone3 | |   P   |   P   |       | - if MaxSkew is 1, incoming pod can only be scheduled to zone3 to become 1/1/1; scheduling it onto zone1(zone2) would make the ActualSkew(2-0) on zone1(zone2) violate MaxSkew(1). - if MaxSkew is 2, incoming pod can be scheduled onto any zone. It''s a required field. Default value is 1 and 0 is not allowed.'
-                              format: int32
-                              type: integer
-                            topologyKey:
-                              description: TopologyKey is the key of node labels. Nodes that have a label with this key and identical values are considered to be in the same topology. We consider each <key, value> as a "bucket", and try to put balanced number of pods into each bucket. It's a required field.
-                              type: string
-                            whenUnsatisfiable:
-                              description: 'WhenUnsatisfiable indicates how to deal with a pod if it doesn''t satisfy the spread constraint. - DoNotSchedule (default) tells the scheduler not to schedule it - ScheduleAnyway tells the scheduler to still schedule it It''s considered as "Unsatisfiable" if and only if placing incoming pod on any topology violates "MaxSkew". For example, in a 3-zone cluster, MaxSkew is set to 1, and pods with the same labelSelector spread as 3/1/1: | zone1 | zone2 | zone3 | | P P P |   P   |   P   | If WhenUnsatisfiable is set to DoNotSchedule, incoming pod can only be scheduled to zone2(zone3) to become 3/2/1(3/1/2) as ActualSkew(2-1) on zone2(zone3) satisfies MaxSkew(1). In other words, the cluster can still be imbalanced, but scheduler won''t make it *more* imbalanced. It''s a required field.'
-                              type: string
-                          required:
-                            - maxSkew
-                            - topologyKey
-                            - whenUnsatisfiable
-                          type: object
-                        type: array
-                      version:
-                        description: Version the cluster should be on.
-                        type: string
-                      volumeMounts:
-                        description: VolumeMounts allows configuration of additional VolumeMounts on the output StatefulSet definition. VolumeMounts specified will be appended to other VolumeMounts in the alertmanager container, that are generated as a result of StorageSpec objects.
-                        items:
-                          description: VolumeMount describes a mounting of a Volume within a container.
-                          properties:
-                            mountPath:
-                              description: Path within the container at which the volume should be mounted.  Must not contain ':'.
-                              type: string
-                            mountPropagation:
-                              description: mountPropagation determines how mounts are propagated from the host to container and the other way around. When not set, MountPropagationNone is used. This field is beta in 1.10.
-                              type: string
-                            name:
-                              description: This must match the Name of a Volume.
-                              type: string
-                            readOnly:
-                              description: Mounted read-only if true, read-write otherwise (false or unspecified). Defaults to false.
-                              type: boolean
-                            subPath:
-                              description: Path within the volume from which the container's volume should be mounted. Defaults to "" (volume's root).
-                              type: string
-                            subPathExpr:
-                              description: Expanded path within the volume from which the container's volume should be mounted. Behaves similarly to SubPath but environment variable references $(VAR_NAME) are expanded using the container's environment. Defaults to "" (volume's root). SubPathExpr and SubPath are mutually exclusive.
-                              type: string
-                          required:
-                            - mountPath
-                            - name
                           type: object
                         type: array
                       affinity:
@@ -2707,57 +2490,6 @@ spec:
                               type: string
                           type: object
                         type: array
-                      topologySpreadConstraints:
-                        description: If specified, the pod's topology spread constraints.
-                        items:
-                          description: TopologySpreadConstraint specifies how to spread matching pods among the given topology.
-                          properties:
-                            labelSelector:
-                              description: LabelSelector is used to find matching pods. Pods that match this label selector are counted to determine the number of pods in their corresponding topology domain.
-                              properties:
-                                matchExpressions:
-                                  description: matchExpressions is a list of label selector requirements. The requirements are ANDed.
-                                  items:
-                                    description: A label selector requirement is a selector that contains values, a key, and an operator that relates the key and values.
-                                    properties:
-                                      key:
-                                        description: key is the label key that the selector applies to.
-                                        type: string
-                                      operator:
-                                        description: operator represents a key's relationship to a set of values. Valid operators are In, NotIn, Exists and DoesNotExist.
-                                        type: string
-                                      values:
-                                        description: values is an array of string values. If the operator is In or NotIn, the values array must be non-empty. If the operator is Exists or DoesNotExist, the values array must be empty. This array is replaced during a strategic merge patch.
-                                        items:
-                                          type: string
-                                        type: array
-                                    required:
-                                      - key
-                                      - operator
-                                    type: object
-                                  type: array
-                                matchLabels:
-                                  additionalProperties:
-                                    type: string
-                                  description: matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels map is equivalent to an element of matchExpressions, whose key field is "key", the operator is "In", and the values array contains only "value". The requirements are ANDed.
-                                  type: object
-                              type: object
-                            maxSkew:
-                              description: 'MaxSkew describes the degree to which pods may be unevenly distributed. It''s the maximum permitted difference between the number of matching pods in any two topology domains of a given topology type. For example, in a 3-zone cluster, MaxSkew is set to 1, and pods with the same labelSelector spread as 1/1/0: | zone1 | zone2 | zone3 | |   P   |   P   |       | - if MaxSkew is 1, incoming pod can only be scheduled to zone3 to become 1/1/1; scheduling it onto zone1(zone2) would make the ActualSkew(2-0) on zone1(zone2) violate MaxSkew(1). - if MaxSkew is 2, incoming pod can be scheduled onto any zone. It''s a required field. Default value is 1 and 0 is not allowed.'
-                              format: int32
-                              type: integer
-                            topologyKey:
-                              description: TopologyKey is the key of node labels. Nodes that have a label with this key and identical values are considered to be in the same topology. We consider each <key, value> as a "bucket", and try to put balanced number of pods into each bucket. It's a required field.
-                              type: string
-                            whenUnsatisfiable:
-                              description: 'WhenUnsatisfiable indicates how to deal with a pod if it doesn''t satisfy the spread constraint. - DoNotSchedule (default) tells the scheduler not to schedule it - ScheduleAnyway tells the scheduler to still schedule it It''s considered as "Unsatisfiable" if and only if placing incoming pod on any topology violates "MaxSkew". For example, in a 3-zone cluster, MaxSkew is set to 1, and pods with the same labelSelector spread as 3/1/1: | zone1 | zone2 | zone3 | | P P P |   P   |   P   | If WhenUnsatisfiable is set to DoNotSchedule, incoming pod can only be scheduled to zone2(zone3) to become 3/2/1(3/1/2) as ActualSkew(2-1) on zone2(zone3) satisfies MaxSkew(1). In other words, the cluster can still be imbalanced, but scheduler won''t make it *more* imbalanced. It''s a required field.'
-                              type: string
-                          required:
-                            - maxSkew
-                            - topologyKey
-                            - whenUnsatisfiable
-                          type: object
-                        type: array
                       affinity:
                         description: If specified, the pod's scheduling constraints.
                         properties:
@@ -3268,16 +3000,6 @@ spec:
                           type: string
                       type: object
                   type: object
-                security:
-                  description: The security configuration for Knative Serving
-                  properties:
-                    securityGuard:
-                      description: Security Guard settings
-                      properties:
-                        enabled:
-                          type: boolean
-                      type: object
-                  type: object
                 manifests:
                   description: A list of serving manifests, which will be installed by the operator
                   items:
@@ -3401,8 +3123,8 @@ kind: ClusterRole
 metadata:
   name: knative-serving-operator-aggregated
   labels:
-    operator.knative.dev/release: "v1.9.2"
-    app.kubernetes.io/version: "1.9.2"
+    operator.knative.dev/release: "v1.8.6"
+    app.kubernetes.io/version: "1.8.6"
     app.kubernetes.io/part-of: knative-operator
 aggregationRule:
   clusterRoleSelectors:
@@ -3418,8 +3140,8 @@ kind: ClusterRole
 metadata:
   name: knative-serving-operator-aggregated-stable
   labels:
-    operator.knative.dev/release: "v1.9.2"
-    app.kubernetes.io/version: "1.9.2"
+    operator.knative.dev/release: "v1.8.6"
+    app.kubernetes.io/version: "1.8.6"
     app.kubernetes.io/part-of: knative-operator
 aggregationRule:
   clusterRoleSelectors:
@@ -3435,8 +3157,8 @@ kind: ClusterRole
 metadata:
   name: knative-eventing-operator-aggregated
   labels:
-    operator.knative.dev/release: "v1.9.2"
-    app.kubernetes.io/version: "1.9.2"
+    operator.knative.dev/release: "v1.8.6"
+    app.kubernetes.io/version: "1.8.6"
     app.kubernetes.io/part-of: knative-operator
 aggregationRule:
   clusterRoleSelectors:
@@ -3452,8 +3174,8 @@ kind: ClusterRole
 metadata:
   name: knative-eventing-operator-aggregated-stable
   labels:
-    operator.knative.dev/release: "v1.9.2"
-    app.kubernetes.io/version: "1.9.2"
+    operator.knative.dev/release: "v1.8.6"
+    app.kubernetes.io/version: "1.8.6"
     app.kubernetes.io/part-of: knative-operator
 aggregationRule:
   clusterRoleSelectors:
@@ -3484,8 +3206,8 @@ apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: knative-serving-operator
   labels:
-    operator.knative.dev/release: "v1.9.2"
-    app.kubernetes.io/version: "1.9.2"
+    operator.knative.dev/release: "v1.8.6"
+    app.kubernetes.io/version: "1.8.6"
     app.kubernetes.io/part-of: knative-operator
 rules:
   - apiGroups:
@@ -3667,66 +3389,14 @@ rules:
       - knative-serving-operator
     verbs:
       - delete
-  # for contour TLS
-  - apiGroups:
-      - projectcontour.io
-    resources:
-      - httpproxies
-      - tlscertificatedelegations
-    verbs:
-      - get
-      - list
-      - watch
-      - update
-      - create
-      - delete
-      - deletecollection
-      - patch
-  # for security-guard
-  - apiGroups:
-      - guard.security.knative.dev
-    resources:
-      - guardians
-    verbs:
-      - get
-      - list
-      - watch
-      - create
-      - update
-      - patch
-      - delete
-  - apiGroups:
-      - ""
-    resources:
-      - configmaps
-    verbs:
-      - get
-      - list
-      - watch
-      - create
-      - update
-      - patch
-      - delete
-  - apiGroups:
-      - authentication.k8s.io
-    resources:
-      - tokenreviews
-    verbs:
-      - create
-  - apiGroups:
-      - ""
-    resources:
-      - pods
-    verbs:
-      - get
 ---
 kind: ClusterRole
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: knative-eventing-operator
   labels:
-    operator.knative.dev/release: "v1.9.2"
-    app.kubernetes.io/version: "1.9.2"
+    operator.knative.dev/release: "v1.8.6"
+    app.kubernetes.io/version: "1.8.6"
     app.kubernetes.io/part-of: knative-operator
 rules:
   - apiGroups:
@@ -4104,8 +3774,8 @@ metadata:
   name: knative-operator
   namespace: default
   labels:
-    operator.knative.dev/release: "v1.9.2"
-    app.kubernetes.io/version: "1.9.2"
+    operator.knative.dev/release: "v1.8.6"
+    app.kubernetes.io/version: "1.8.6"
     app.kubernetes.io/part-of: knative-operator
 
 ---
@@ -4129,8 +3799,8 @@ kind: ClusterRoleBinding
 metadata:
   name: knative-serving-operator
   labels:
-    operator.knative.dev/release: "v1.9.2"
-    app.kubernetes.io/version: "1.9.2"
+    operator.knative.dev/release: "v1.8.6"
+    app.kubernetes.io/version: "1.8.6"
     app.kubernetes.io/part-of: knative-operator
 roleRef:
   apiGroup: rbac.authorization.k8s.io
@@ -4147,8 +3817,8 @@ kind: ClusterRoleBinding
 metadata:
   name: knative-eventing-operator
   labels:
-    operator.knative.dev/release: "v1.9.2"
-    app.kubernetes.io/version: "1.9.2"
+    operator.knative.dev/release: "v1.8.6"
+    app.kubernetes.io/version: "1.8.6"
     app.kubernetes.io/part-of: knative-operator
 roleRef:
   apiGroup: rbac.authorization.k8s.io
@@ -4181,7 +3851,7 @@ metadata:
   name: knative-operator-webhook
   labels:
     eventing.knative.dev/release: devel
-    app.kubernetes.io/version: "1.9.2"
+    app.kubernetes.io/version: "1.8.6"
     app.kubernetes.io/part-of: knative-operator
 rules:
   # For manipulating certs into secrets.
@@ -4203,7 +3873,7 @@ metadata:
   name: knative-operator-webhook
   labels:
     eventing.knative.dev/release: devel
-    app.kubernetes.io/version: "1.9.2"
+    app.kubernetes.io/version: "1.8.6"
     app.kubernetes.io/part-of: knative-operator
 rules:
   # For watching logging configuration and getting certs.
@@ -4294,8 +3964,8 @@ metadata:
   name: operator-webhook
   namespace: default
   labels:
-    operator.knative.dev/release: "v1.9.2"
-    app.kubernetes.io/version: "1.9.2"
+    operator.knative.dev/release: "v1.8.6"
+    app.kubernetes.io/version: "1.8.6"
     app.kubernetes.io/part-of: knative-operator
 
 ---
@@ -4320,7 +3990,7 @@ metadata:
   name: operator-webhook
   labels:
     eventing.knative.dev/release: devel
-    app.kubernetes.io/version: "1.9.2"
+    app.kubernetes.io/version: "1.8.6"
     app.kubernetes.io/part-of: knative-operator
 subjects:
   - kind: ServiceAccount
@@ -4336,8 +4006,8 @@ kind: ClusterRoleBinding
 metadata:
   name: operator-webhook
   labels:
-    operator.knative.dev/release: "v1.9.2"
-    app.kubernetes.io/version: "1.9.2"
+    operator.knative.dev/release: "v1.8.6"
+    app.kubernetes.io/version: "1.8.6"
     app.kubernetes.io/part-of: knative-operator
 roleRef:
   apiGroup: rbac.authorization.k8s.io
@@ -4368,8 +4038,8 @@ kind: ClusterRoleBinding
 metadata:
   name: knative-serving-operator-aggregated
   labels:
-    operator.knative.dev/release: "v1.9.2"
-    app.kubernetes.io/version: "1.9.2"
+    operator.knative.dev/release: "v1.8.6"
+    app.kubernetes.io/version: "1.8.6"
     app.kubernetes.io/part-of: knative-operator
 roleRef:
   apiGroup: rbac.authorization.k8s.io
@@ -4385,8 +4055,8 @@ kind: ClusterRoleBinding
 metadata:
   name: knative-serving-operator-aggregated-stable
   labels:
-    operator.knative.dev/release: "v1.9.2"
-    app.kubernetes.io/version: "1.9.2"
+    operator.knative.dev/release: "v1.8.6"
+    app.kubernetes.io/version: "1.8.6"
     app.kubernetes.io/part-of: knative-operator
 roleRef:
   apiGroup: rbac.authorization.k8s.io
@@ -4402,8 +4072,8 @@ kind: ClusterRoleBinding
 metadata:
   name: knative-eventing-operator-aggregated
   labels:
-    operator.knative.dev/release: "v1.9.2"
-    app.kubernetes.io/version: "1.9.2"
+    operator.knative.dev/release: "v1.8.6"
+    app.kubernetes.io/version: "1.8.6"
     app.kubernetes.io/part-of: knative-operator
 roleRef:
   apiGroup: rbac.authorization.k8s.io
@@ -4419,8 +4089,8 @@ kind: ClusterRoleBinding
 metadata:
   name: knative-eventing-operator-aggregated-stable
   labels:
-    operator.knative.dev/release: "v1.9.2"
-    app.kubernetes.io/version: "1.9.2"
+    operator.knative.dev/release: "v1.8.6"
+    app.kubernetes.io/version: "1.8.6"
     app.kubernetes.io/part-of: knative-operator
 roleRef:
   apiGroup: rbac.authorization.k8s.io
@@ -4452,8 +4122,8 @@ metadata:
   name: config-logging
   namespace: default
   labels:
-    operator.knative.dev/release: "v1.9.2"
-    app.kubernetes.io/version: "1.9.2"
+    operator.knative.dev/release: "v1.8.6"
+    app.kubernetes.io/version: "1.8.6"
     app.kubernetes.io/part-of: knative-operator
 data:
   _example: |
@@ -4516,8 +4186,8 @@ metadata:
   name: config-observability
   namespace: default
   labels:
-    operator.knative.dev/release: "v1.9.2"
-    app.kubernetes.io/version: "1.9.2"
+    operator.knative.dev/release: "v1.8.6"
+    app.kubernetes.io/version: "1.8.6"
     app.kubernetes.io/part-of: knative-operator
 data:
   _example: |
@@ -4620,9 +4290,9 @@ metadata:
   name: knative-operator
   namespace: default
   labels:
-    operator.knative.dev/release: "v1.9.2"
+    operator.knative.dev/release: "v1.8.6"
     app.kubernetes.io/name: knative-operator
-    app.kubernetes.io/version: "1.9.2"
+    app.kubernetes.io/version: "1.8.6"
     app.kubernetes.io/part-of: knative-operator
 spec:
   replicas: 1
@@ -4636,13 +4306,13 @@ spec:
       labels:
         name: knative-operator
         app.kubernetes.io/name: knative-operator
-        app.kubernetes.io/version: "1.9.2"
+        app.kubernetes.io/version: "1.8.6"
         app.kubernetes.io/part-of: knative-operator
     spec:
       serviceAccountName: knative-operator
       containers:
         - name: knative-operator
-          image: gcr.io/knative-releases/knative.dev/operator/cmd/operator@sha256:1ca8f2e2514ec294a591f1d465bdfe59575e15a2430e33aa7fd81857fbf1f312
+          image: gcr.io/knative-releases/knative.dev/operator/cmd/operator@sha256:7f746f054941fe7a7a142cdc122190a5f52b3ff036a46da607cfd930c159fbbc
           imagePullPolicy: IfNotPresent
           env:
             - name: POD_NAME

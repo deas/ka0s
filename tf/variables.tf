@@ -5,6 +5,11 @@ variable "kind_cluster_name" {
   # default     = "ka0s"
 }
 
+variable "kind_cluster_image" {
+  type    = string
+  default = null
+}
+
 variable "id_rsa_ro_path" {
   type    = string
   default = null

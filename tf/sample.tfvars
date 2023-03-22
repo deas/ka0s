@@ -1,5 +1,6 @@
 # default is null -> use cluster from env
 kind_cluster_name = "ka0s"
+# kind_cluster_image = "kindest/node:v1.23.13"
 # metallb           = true
 # Sample overrides for local-proxy
 # flux_kustomization_path = "../clusters/local-proxy/flux-system"
