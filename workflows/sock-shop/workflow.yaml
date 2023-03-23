@@ -84,9 +84,8 @@ spec:
             if [ -n "{{workflow.parameters.httpsProxy}}" ] ; then
               export HTTPS_PROXY={{workflow.parameters.httpsProxy}}
             fi  
-            kubectl apply -f https://hub.litmuschaos.io/api/chaos/2.14.0?file=charts/generic/experiments.yaml -n
-            {{workflow.parameters.adminModeNamespace}} ; sleep 30
-
+            kubectl apply -f https://hub.litmuschaos.io/api/chaos/2.14.0?file=charts/generic/experiments.yaml -n {{workflow.parameters.adminModeNamespace}}
+            sleep 30
     - name: pod-cpu-hog
       inputs:
         artifacts:
