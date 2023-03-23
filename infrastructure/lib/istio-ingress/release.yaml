@@ -13,9 +13,10 @@ spec:
         name: istio
         namespace: flux-system
       version: "1.17.1"
-  dependsOn:
-    - name: istio-base
-      namespace: istio-system
+  # TODO: Due to helm chart 403 workarounds on our installation, we cannot use helm dependency atm
+  # dependsOn:
+  #   - name: istio-base
+  #     namespace: istio-system
   interval: 5m
   install:
     remediation:
