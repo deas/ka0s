@@ -31,7 +31,8 @@
                    #pkgs.kubernix
                    pkgs.gnumake
                    pkgs.github-cli
-                   #pkgs.babashka
+                   pkgs.babashka
+                   pkgs.grafana-loki
                    pkgs.kubectl
                    pkgs.istioctl
                    #pkgs.docker

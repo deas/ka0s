@@ -15,6 +15,7 @@ resources:
   # - litmus/11-dashboards.yaml
   - release-kube-prometheus.yaml
   - release-loki.yaml
+  - release-promtail.yaml
   - configmap-dashboards-istio.yaml
   - configmap-dashboards-sock-shop.yaml
   # - release-minio.yaml

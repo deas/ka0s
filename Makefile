@@ -62,6 +62,11 @@ create-dashboard-configmaps: ## Create dashbaord ConfigMaps
 	@echo "Make sure to add label for grafana sidecar"
 	@echo
 
+.PHONY: workload-labels
+workload-labels:
+	kubectl -n $(LITMUS_NS) get deployments -o=json | jq '.items[] | {kind: .kind, name: .metadata.name, labels: .metadata.labels}'
+	kubectl -n $(LITMUS_NS) get sts -o=json | jq '.items[] | {kind: .kind, name: .metadata.name, labels: .metadata.labels}'
+
 
 .PHONY: fmt
 fmt: ## Format
