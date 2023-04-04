@@ -1,0 +1,121 @@
+kind: Workflow
+apiVersion: argoproj.io/v1alpha1
+metadata:
+  name: sample
+  namespace: litmus
+  creationTimestamp: null
+  labels:
+    subject: sock-shop_litmus
+    workflows.argoproj.io/controller-instanceid: 5b2c2046-fcbb-4c40-8cd8-4a864aeeb546
+spec:
+  templates:
+    - name: argowf-chaos
+      inputs: {}
+      outputs: {}
+      metadata: {}
+      steps:
+        - - name: nop
+            template: nop 
+            arguments: {}
+        - - name: pod-delete
+            template: pod-delete
+            arguments: {}
+    - name: nop
+      inputs: {}
+      outputs: {}
+      metadata: {}
+      container:
+        name: ""
+        image: litmuschaos/k8s:latest
+        command:
+          - sh
+          - -c
+        args:
+          - >
+            echo nop
+        resources: {}
+    - name: pod-delete
+      inputs:
+        artifacts:
+          - name: pod-delete
+            path: /tmp/chaosengine.yaml
+            raw:
+              data: >
+                apiVersion: litmuschaos.io/v1alpha1
+
+                kind: ChaosEngine
+
+                metadata:
+                  namespace: "{{workflow.parameters.adminModeNamespace}}"
+                  labels:
+                    workflow_run_id: "{{workflow.uid}}"
+                  generateName: catalogue-pod-delete-chaos
+                spec:
+                  appinfo:
+                    appns: "{{workflow.parameters.appNamespace}}"
+                    applabel: name=catalogue
+                    appkind: deployment
+                  engineState: active
+                  chaosServiceAccount: litmus-admin
+                  jobCleanUpPolicy: retain
+                  components:
+                    runner:
+                      imagePullPolicy: Always
+                  experiments:
+                    - name: pod-delete
+                      spec:
+                        probe:
+                          - name: check-catalogue-access-url
+                            type: httpProbe
+                            httpProbe/inputs:
+                              url: http://front-end.{{workflow.parameters.appNamespace}}.svc.cluster.local:80/catalogue
+                              insecureSkipVerify: false
+                              method:
+                                get:
+                                  criteria: ==
+                                  responseCode: "200"
+                            mode: EOT
+                            runProperties:
+                              probeTimeout: 500
+                              interval: 1
+                              retry: 0
+                              stopOnFailure: true  
+                              probePollingInterval: 1
+                              initialDelaySeconds: 2
+                        components:
+                          env:
+                            - name: TOTAL_CHAOS_DURATION
+                              value: "30"
+                            - name: CHAOS_INTERVAL
+                              value: "10"
+                            - name: FORCE
+                              value: "false"
+      outputs: {}
+      metadata:
+        labels:
+          weight: "10"
+      container:
+        name: ""
+        image: litmuschaos/litmus-checker:latest
+        args:
+          - -file=/tmp/chaosengine.yaml
+          - -saveName=/tmp/engine-name
+        resources: {}
+  entrypoint: argowf-chaos
+  arguments:
+    parameters:
+      - name: adminModeNamespace
+        value: litmus
+      - name: appNamespace
+        value: sock-shop
+      - name: socketPath
+        value: /var/run/containerd/containerd.sock
+      - name: httpsProxy
+        value: ""
+  serviceAccountName: argo-chaos
+  securityContext:
+    runAsUser: 1000
+    runAsNonRoot: true
+status:
+  ? startedAt
+  ? finishedAt

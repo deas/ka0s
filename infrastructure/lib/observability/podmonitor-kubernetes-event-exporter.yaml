@@ -1,0 +1,14 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: kubernetes-event-exporter
+  namespace: monitoring
+  labels:
+    release: prometheus
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: kubernetes-event-exporter
+  podMetricsEndpoints:
+  - port: metrics
+    path: "/metrics"

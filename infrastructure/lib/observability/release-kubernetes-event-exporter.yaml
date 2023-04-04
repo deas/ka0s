@@ -1,0 +1,30 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: kubernetes-event-exporter
+  namespace: monitoring
+spec:
+  releaseName: kubernetes-event-exporter
+  chart:
+    spec:
+      chart: kubernetes-event-exporter
+      sourceRef:
+        kind: HelmRepository
+        name: kubernetes-event-exporter
+        namespace: flux-system
+      version: "0.1.0"
+  interval: 5m
+  install:
+    remediation:
+      retries: 3
+  values: {}
+    # config: |
+    #   logLevel: error
+    #   logFormat: json
+    #   route:
+    #     routes:
+    #       - match:
+    #       - receiver: "dump"
+    #   receivers:
+    #     - name: "dump"
+    #       stdout: {}

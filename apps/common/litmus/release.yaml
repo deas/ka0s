@@ -23,6 +23,16 @@ spec:
       frontend:
         service:
           type: LoadBalancer
+          annotations:
+            metallb.universe.tf/allow-shared-ip: "litmus-share"
+            # metallb.universe.tf/loadBalancerIPs: "172.18.255.200"
+      server:
+        graphqlServer:
+          service:
+            type: LoadBalancer
+          annotations:
+            metallb.universe.tf/allow-shared-ip: "litmus-share"
+            # metallb.universe.tf/loadBalancerIPs: "172.18.255.200"
     #server:
     ## TODO: chaos-litmus-server should support HTTPS_PROXY, HTTP_PROXY, NO_PROXY and ca certs (via mount)
     ## TODO: Appears to be minimal bit to get proxy - should probably tweak upstream chart, or use https://fluxcd.io/flux/components/helm/helmreleases/#post-renderers

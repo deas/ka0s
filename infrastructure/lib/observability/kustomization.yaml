@@ -3,22 +3,14 @@ kind: Kustomization
 # namespace: ..
 resources:
   - namespace.yaml
-  # - litmus/02-prometheus-rbac.yaml
-  # - litmus/03-prometheus-configmap.yaml
-  # - litmus/04-prometheus-alert-rules.yaml
-  # - litmus/05-prometheus-deployment.yaml
-  # - litmus/06-prometheus-svc.yaml
-  # - litmus/07-grafana-deployment.yaml
-  # - litmus/08-grafana-svc.yaml
-  # - litmus/09-grafana-datasources.yaml
-  # - litmus/10-grafana-dashboards.yaml
-  # - litmus/11-dashboards.yaml
   - release-kube-prometheus.yaml
   - release-loki.yaml
+  - eventrouter.yaml
+  # TODO: event-exporter/kubewatch and other current things don't directly play with prometheus
+  # - release-kubernetes-event-exporter.yaml
+  # - podmonitor-kubernetes-event-exporter.yaml
+  # - release-metrics-server.yaml
   - release-promtail.yaml
   - configmap-dashboards-istio.yaml
   - configmap-dashboards-sock-shop.yaml
   # - release-minio.yaml
-## namespace: ..
-#resources:
-#  - kube-prometheus-flux.yaml

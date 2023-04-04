@@ -66,18 +66,30 @@ spec:
       #      configMapKeyRef:
       #        name: enviroment-vars
       #        key: contenedor
+      # initContainers:
+      # - name: git
+      #   image: bitnami/git:latest
+      #   command: ["echo", "hello"]
+      #   mirrorVolumeMounts: true
+      volumes:
+        - name: src
+          emptyDir: {}
       container:
-        image: litmuschaos/k8s:latest
+        image: litmuschaos/k8s:latest # TODO: Does not have git ... yet
         command: [sh, -c]
         args:
           - |
             set -e
+            export GIT_SSL_NO_VERIFY=true
             export KUBERNETES_SERVICE_HOST=kubernetes.default.svc.cluster.local
             export NO_PROXY=.cluster.local
             if [ -n "{{workflow.parameters.httpsProxy}}" ] ; then
               export HTTPS_PROXY={{workflow.parameters.httpsProxy}}
             fi
             curl -sk https://raw.githubusercontent.com/deas/ka0s/wip/app-manifest/{{workflow.parameters.appFlavour}}-sock-shop.yaml | kubectl apply -f -
+        volumeMounts:
+          - name: src
+            mountPath: /src
       #container:
       #  image: litmuschaos/litmus-app-deployer:latest
       #  args: ["-namespace={{workflow.parameters.appNamespace}}","-typeName=resilient","-operation=apply","-timeout=400", "-app=sock-shop","-scope=cluster"] #for weak provide type flagName as resilient(-typeName=weak)
@@ -89,6 +101,7 @@ spec:
         args:
           - |
             set -e
+            export GIT_SSL_NO_VERIFY=true
             export KUBERNETES_SERVICE_HOST=kubernetes.default.svc.cluster.local
             export NO_PROXY=.cluster.local
             if [ -n "{{workflow.parameters.httpsProxy}}" ] ; then
@@ -474,6 +487,7 @@ spec:
         args:
           - |
             set -e
+            export GIT_SSL_NO_VERIFY=true
             export KUBERNETES_SERVICE_HOST=kubernetes.default.svc.cluster.local
             export NO_PROXY=.cluster.local
             if [ -n "{{workflow.parameters.httpsProxy}}" ] ; then
@@ -490,12 +504,14 @@ spec:
         args:
           - |
             set -e
+            export GIT_SSL_NO_VERIFY=true
             export KUBERNETES_SERVICE_HOST=kubernetes.default.svc.cluster.local
             export NO_PROXY=.cluster.local
             if [ -n "{{workflow.parameters.httpsProxy}}" ] ; then
               export HTTPS_PROXY={{workflow.parameters.httpsProxy}}
             fi
             curl -sk https://raw.githubusercontent.com/deas/ka0s/wip/app-manifest/loadtest.yaml | kubectl apply -f -
+            kubectl -n loadtest --timeout=300s wait --for=condition=available deployment -l app=loadtest
       #  image: litmuschaos/litmus-app-deployer:latest
       #  args: ["-namespace=loadtest", "-app=loadtest"]
 
@@ -506,6 +522,7 @@ spec:
         args:
          - |
            set -e
+           export GIT_SSL_NO_VERIFY=true
            export KUBERNETES_SERVICE_HOST=kubernetes.default.svc.cluster.local
            export NO_PROXY=.cluster.local
            if [ -n "{{workflow.parameters.httpsProxy}}" ] ; then

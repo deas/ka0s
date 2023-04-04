@@ -96,7 +96,8 @@ Litmus : `admin` / `litmus`.
 
 ## TODO
 - There are TODO tags in the code
-- Istio/Sock-Shop Dashboads
+- Leverage `kustomize` with remote repos/resources in workflow (`litmuschaos/k8s:latest` does not yet have `git`) 
+- Leverage Istio for failure injection?
 - This repo can act as a ChaosHub - add it during setup
 - Add first class support for `mitmproxy` (ship deployment)
 - Add first class support for remote agent?
@@ -105,7 +106,6 @@ Litmus : `admin` / `litmus`.
 - Manifests Naming
 - Fix annoying terraform plan ` yaml_incluster`
 - Add knative-serving/eventing/dns (using `nip.io`?)
-- Leverage `litmusctl`
 - How do we manage litmus projects (using ui?)?
 - Add mongodb/prometheus convenience (e.g. auth) targets to `Makefile`
 - Test drive 3.0-beta
@@ -114,11 +114,8 @@ Litmus : `admin` / `litmus`.
 - Implement weak-sock-shop
 - Catchup scheduled sock-shop workflow
 - Try Prometheus alerts
-
-## Observability
-- Add loki w [minIO](https://github.com/minio/minio/tree/master/helm/minio)
-- http://prometheus.monitoring.svc.cluster.local:9090 
-- [`monitoring: true`](https://github.com/litmuschaos/litmus/blob/master/demo/sample-applications/sock-shop/chaos/orders/orders-memory-hog.yaml#L15)? Explain does not show a lot
+- How would eBPF/Cilium help?
+- Introduce istio based tracing
 
 ## Known Issues
 - Some experiments from `litmus-go` appear to rely on `/var/run/docker.sock` which does not exist with containerd based environments ([see](https://docs.litmuschaos.io/docs/troubleshooting))

@@ -56,7 +56,36 @@ spec:
     ##
     grafana:
       enabled: true
-    
+      # dashboardProviders: # {}
+      #   dashboardproviders.yaml:
+      #     apiVersion: 1
+      #     providers:
+      #     - disableDeletion: false
+      #       folder: istio
+      #       name: istio
+      #       options:
+      #         path: /var/lib/grafana/dashboards/istio
+      #       orgId: 1
+      #       type: file
+      #     - disableDeletion: false
+      #       folder: istio
+      #       name: istio-services
+      #       options:
+      #         path: /var/lib/grafana/dashboards/istio-services
+      #       orgId: 1
+      #       type: file
+      #     # apiVersion: 1
+      #     # providers:
+      #     # - name: 'default'
+      #     #   orgId: 1
+      #     #   folder: ''
+      #     #   type: file
+      #     #   disableDeletion: false
+      #     #   editable: true
+      #     #   options:
+      #     #     path: /var/lib/grafana/dashboards/default
+
+
       sidecar:
         dashboards:
           enabled: true
@@ -105,7 +134,11 @@ spec:
             # datasourceUid: Jaeger
             # traceIdLabelName: trace_id
     
-      extraConfigmapMounts: []
+      extraConfigmapMounts: [] # Introduces coupling - prefer label based drop in
+      # - name: dashboards-istio
+      #   mountPath: "/var/lib/grafana/dashboards/istio"
+      # - name: dashboards-istio-services
+      #   mountPath: "/var/lib/grafana/dashboards/istio-services"
       # - name: certs-configmap
       #   mountPath: /etc/grafana/ssl/
       #   configMap: certs-configmap

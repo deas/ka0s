@@ -8,6 +8,11 @@ resources:
   - flux.yaml
   - istio.yaml
   - litmuschaos.yaml
-  - minio.yaml
+  # - minio.yaml
   - grafana.yaml
   - prometheus-community.yaml
+  - metrics-server.yaml
+  - kiali.yaml
+  - openzipkin.yaml
+  # - jaegertracing.yaml
+  # - kubernetes-event-exporter.yaml

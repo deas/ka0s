@@ -1,0 +1,23 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: jaeger
+  namespace: istio-system
+spec:
+  releaseName: jaeger
+  chart:
+    spec:
+      chart: jaeger
+      sourceRef:
+        kind: HelmRepository
+        name: jaeger
+        namespace: flux-system
+      version: "0.69.1"
+  #dependsOn:
+  #  - name: other-thing
+  #    namespace: other-ns
+  interval: 5m
+  install:
+    remediation:
+      retries: 3
+  values: {}

@@ -1,0 +1,29 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: kiali
+  namespace: istio-system
+spec:
+  releaseName: kiali
+  chart:
+    spec:
+      chart: kiali-server
+      sourceRef:
+        kind: HelmRepository
+        name: kiali
+        namespace: flux-system
+      version: "1.65.0"
+  #dependsOn:
+  #  - name: other-thing
+  #    namespace: other-ns
+  interval: 5m
+  install:
+    remediation:
+      retries: 3
+  values:
+    deployment:
+      service_type: LoadBalancer
+      # service_annotations:
+      #   metallb.universe.tf/allow-shared-ip: "litmus-share"
+      #   # metallb.universe.tf/loadBalancerIPs: "172.18.255.200"
+

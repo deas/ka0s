@@ -1,4 +1,5 @@
 KUBECTL=kubectl
+HELM=helm
 KUBECTL_PATCH=$(KUBECTL) -n $(LITMUS_NS) patch --type=json
 CA_CERTS_FILE=/etc/ssl/certs/ca-certificates.crt
 SSH_PUB_KEY=keys/id_rsa-ka0s.pub
@@ -62,11 +63,35 @@ create-dashboard-configmaps: ## Create dashbaord ConfigMaps
 	@echo "Make sure to add label for grafana sidecar"
 	@echo
 
+.PHONY: apply-litmuscrds
+apply-litmus-crds: ## Apply litmus crds only. This is needed for litmusctl to deploy.
+	$(KUBECTL) apply -f https://github.com/litmuschaos/litmus/blob/release-2.14.0/litmus-portal/manifests/litmus-portal-crds.yml
+
+
 .PHONY: workload-labels
 workload-labels:
-	kubectl -n $(LITMUS_NS) get deployments -o=json | jq '.items[] | {kind: .kind, name: .metadata.name, labels: .metadata.labels}'
-	kubectl -n $(LITMUS_NS) get sts -o=json | jq '.items[] | {kind: .kind, name: .metadata.name, labels: .metadata.labels}'
+	$(KUBECTL) -n $(LITMUS_NS) get deployments -o=json | jq '.items[] | {kind: .kind, name: .metadata.name, labels: .metadata.labels}'
+	$(KUBECTL) -n $(LITMUS_NS) get sts -o=json | jq '.items[] | {kind: .kind, name: .metadata.name, labels: .metadata.labels}'
 
+# helm repo add metrics-server https://kubernetes-sigs.github.io/metrics-server
+.PHONY: install-metrics-server
+install-metrics-server: ## Install metrics server
+	echo 'defaultArgs: ["--cert-dir=/tmp", "--kubelet-preferred-address-types=InternalIP,ExternalIP,Hostname", "--kubelet-use-node-status-port", "--metric-resolution=15s", "--kubelet-insecure-tls"]' | \
+	$(HELM) upgrade --install -n monitoring --create-namespace metrics-server metrics-server/metrics-server -f -
+# --kubelet-insecure-tls # Needed for at least kind
+
+.PHONY: remove-sock-shop-probes
+remove-sock-shop-probes: ## Remove liveness probes from all sock-shop deployments
+	$(KUBECTL) -n sock-shop get deployments -l app=sock-shop -o name | xargs -I{} $(KUBECTL) -n sock-shop patch {} --type=json -p="[{'op': 'remove', 'path': '/spec/template/spec/containers/0/readinessProbe'}]" || true
+	$(KUBECTL) -n sock-shop get deployments -l app=sock-shop -o name | xargs -I{} $(KUBECTL) -n sock-shop patch {} --type=json -p="[{'op': 'remove', 'path': '/spec/template/spec/containers/0/livenessProbe'}]" || true
+
+.PHONY: all-loadbalancer-services
+all-loadbalancer-services:
+	$(KUBECTL) get svc -A -o jsonpath='{range .items[?(@.spec.type=="LoadBalancer")]}{.status.loadBalancer.ingress[].ip}:{.spec.ports[].port}{"\n"}{end}'
+
+.PHONY: show-kiali-token
+show-kiali-token: ## Show kiali token
+	@$(KUBECTL) -n istio-system get $$($(KUBECTL) -n istio-system get secret -o name | grep secret/kiali) --template={{.data.token}} | base64 --decode; echo
 
 .PHONY: fmt
 fmt: ## Format
