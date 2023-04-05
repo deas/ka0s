@@ -1,0 +1,42 @@
+# clusterroles.rbac.authorization.k8s.io "ka0s-cluster-role" is forbidden: user "system:serviceaccount:litmus:litmus-server-account" (groups=["system:serviceaccounts" "system:serviceaccounts:litmus" "system:authenticated"]) is attempting to grant RBAC permissions not currently held:
+# {APIGroups:["monitoring.coreos.com"], Resources:["podmonitors"], Verbs:["create" "get" "watch" "patch" "delete" "list"]}
+# {APIGroups:["monitoring.coreos.com"], Resources:["servicemonitors"], Verbs:["create" "get" "watch" "patch" "delete" "list"]}
+# clusterroles.rbac.authorization.k8s.io "ka0s-cluster-role" not found
+# SOME MANIFESTS HAS NOT BEEN INSTALLED:
+# apiVersion: rbac.authorization.k8s.io/v1
+# kind: ClusterRole
+# metadata:
+#   name: ka0s-cluster-role
+# rules:
+# - apiGroups:
+#   - monitoring.coreos.com
+#   resources:
+#   - servicemonitors
+#   - podmonitors
+#   verbs:
+#   - create
+#   - get
+#   - watch
+#   - patch
+#   - delete
+#   - list
+# - apiGroups:
+#   - apps
+#   resources:
+#   - deployments
+#   - statefulsets
+#   verbs:
+#   - list
+# ---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: ka0s-cluster-role-binding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: ka0s-cluster-role
+subjects:
+- kind: ServiceAccount
+  name: argo-chaos
+  namespace: litmus

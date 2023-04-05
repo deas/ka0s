@@ -28,10 +28,26 @@ spec:
             # metallb.universe.tf/loadBalancerIPs: "172.18.255.200"
       server:
         graphqlServer:
+          # volumes:
+          # - name: gitops-storage
+          #   emptyDir: {}
+          # - name: hub-storage
+          #   emptyDir: {}
+          # - name: ka0s-manifests
+          #   configMap:
+          #     name: ka0s-manifests
+          # volumeMounts:
+          # - mountPath: /tmp/
+          #   name: gitops-storage
+          # - mountPath: /tmp/version
+          #   name: hub-storage
+          # - name: ka0s-manifests
+          #   mountPath: /litmus/manifests/cluster/4a_ka0s_rbac.yaml
+          #   subPath: 4a_ka0s_rbac.yaml
           service:
             type: LoadBalancer
-          annotations:
-            metallb.universe.tf/allow-shared-ip: "litmus-share"
+            annotations:
+              metallb.universe.tf/allow-shared-ip: "litmus-share"
             # metallb.universe.tf/loadBalancerIPs: "172.18.255.200"
     #server:
     ## TODO: chaos-litmus-server should support HTTPS_PROXY, HTTP_PROXY, NO_PROXY and ca certs (via mount)

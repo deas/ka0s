@@ -6,7 +6,7 @@ If you just want to kick the Chaos the tires quickly, or if you want to build a 
 
 Experimentation is a natural element of Chaos Engineering. However, it should be just as natural in Software Development in general. That is why you might encounter bits (such as Knative) with no strong Chaos Engineering relationship in this repo. Those are meant to be optional.
 
-The default `localhost` cluster environment has very few requirements. It should work on many types of clusters. However, it is optimized to work with just enough resources to run the whole Chaos Stack and the resilient Sock Shop. 
+The default `localhost` cluster environment has very few requirements. It should work on many types of clusters. However, it is optimized to work with just enough resources to run the whole Chaos Stack and the resilient Sock Shop. It aims to make things easiliy accessible.
 
 Various things I built upon had minor issues (mostly because there where outdated). At this time, the "fixes" are here because I wanted to move on quickly. Would be happy to contribute back. 
 
@@ -18,7 +18,7 @@ This repo is derived from [flux-conductr](https://github.com/deas/flux-conductr)
 - We serve the [Sock Shop Microservices Demo Application](https://microservices-demo.github.io/) as a scenario (defaulting to `containerd` experiments)
 - Prometheus Stack including Grafana provisioned for the Sock Shop Appliation
 - Loki
-- Istio Eventing/Serving
+- Istio Eventing/Serving/Tracing (zipkin)
 - Knative
 - [Locust](https://locust.io/) load testing (supporting the UI)
 - Portal API usage examples
@@ -90,6 +90,16 @@ The `terraform` module provides a mechanism to patch the `coredns` `ConfigMap`. 
 I use `mitmproxy` locally to try things out.
 
 ## Misc
+The `local` cluster uses metallb to provide a loadbalancer. It binds multiple services to a single IP using `metallb.universe.tf/allow-shared-ip`.
+
+The following ports are used:
+- `9091` : Litmus Portal
+- `9002` : Litmus Server (for remote agents)
+- `3000` : Grafana
+- `20001` : Kiali (Istio)
+
+Acting as a ChaosHub, this repo serves the `sock-shop` [scenario/workflow](./workflows/sock-shop/workflow.yaml)
+
 ### Autentication
 Grafana : `admin` / `prom-operator`.
 Litmus : `admin` / `litmus`.
@@ -111,17 +121,17 @@ Litmus : `admin` / `litmus`.
 - Test drive 3.0-beta
 - Introduce kubeconfig module so we don't rely on environment w/o `kind`
 - `disk-fill` does not yet play with containerd
-- Implement weak-sock-shop
 - Catchup scheduled sock-shop workflow
 - Try Prometheus alerts
 - How would eBPF/Cilium help?
-- Introduce istio based tracing
+- ~~Introduce istio based tracing~~
 
 ## Known Issues
 - Some experiments from `litmus-go` appear to rely on `/var/run/docker.sock` which does not exist with containerd based environments ([see](https://docs.litmuschaos.io/docs/troubleshooting))
 - Knative deployment straight from github deployment not possible
 - knative challenging (Some bits need `kustomize.toolkit.fluxcd.io/substitute: disabled` in our context, other things need tweaks to upstream yaml to play with GitOps "... configured")
 - Istio Ingress appears to have an image pulling issue, so it takes a while to come up
+- litmus release removal should remove default agent?
 
 ## Misc/Random Bits
 - https://istio.io/latest/docs/setup/install/helm

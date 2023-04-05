@@ -1,0 +1,58 @@
+apiVersion: litmuschaos.io/v1alpha1
+kind: ChaosEngine
+metadata:
+  name: k8s-probe-pod-delete-chaos
+  namespace: litmus # {{workflow.parameters.adminModeNamespace}}
+  #labels:
+  #  context: "sock-shop_catalogue" # "{{workflow.parameters.appNamespace}}_catalogue"
+spec:
+  appinfo:
+    appns: 'sock-shop'
+    applabel: 'app=nginx'
+    appkind: 'deployment'
+  engineState: 'active'
+  chaosServiceAccount: litmus-admin
+  jobCleanUpPolicy: 'retain'
+  components:
+    runner:
+      imagePullPolicy: Always
+  experiments:
+    # Catalogue pod takes 3 minutes to get ready?
+    - name: pod-delete
+      spec:
+        probe:
+        - name: "check-all-pods-running"
+          type: "k8sProbe"
+
+          k8sProbe/inputs:
+            # group: '<appGroup>'
+            version: 'v1'
+            resource: 'Pod'
+            namespace: 'sock-shop'
+            fieldSelector: 'status.phase!=Running'
+            labelSelector: 'app=nginx'
+            operation: 'absent' # it can be present, absent, create, delete
+          # httpProbe/inputs:
+          #   url: "http://front-end.sock-shop.svc.cluster.local:80/catalogue"
+          #   insecureSkipVerify: false
+          #   # responseTimeout: 100
+          #   method:
+          #     get:
+          #       criteria: "=="
+          #       responseCode: "200"
+
+          mode: "EOT"
+          runProperties:
+            probeTimeout: 1000
+            interval: 5
+            retry: 0
+        components:
+          env:
+            - name: TOTAL_CHAOS_DURATION
+              value: '30'
+            # set chaos interval (in sec) as desired
+            - name: CHAOS_INTERVAL
+              value: '10'
+            # pod failures without '--force' & default terminationGracePeriodSeconds
+            - name: FORCE
+              value: 'false'

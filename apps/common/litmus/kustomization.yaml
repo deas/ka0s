@@ -3,6 +3,9 @@ kind: Kustomization
 namespace: litmus
 resources:
   - namespace.yaml
+  - configmap-manifests.yaml
+  - rbac.yaml
   - release.yaml
   - service-monitor-chaos-exporter.yaml
+  # - ka0s-rbac.yaml # Need to make sure this is added after the portal adds the argo-chaos sa
 

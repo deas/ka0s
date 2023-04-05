@@ -7,6 +7,7 @@ LITMUS_NS=litmus
 LITMUS_SERVER_DEPLOYMENT=litmus-server
 PATCH_LITMUS_CA_CERTS=assets/patch-litmus-ca-certs.yaml
 PATCH_LITMUS_SERVER_PROXY=assets/patch-litmus-server-proxy.yaml
+APP_FLAVOR=weak
 
 .DEFAULT_GOAL := help
 
@@ -53,7 +54,7 @@ patch-litmus-proxy-env: ## Patch litmus proxy env
 
 .PHONY: create-locust-configmap
 create-locust-configmap: ## Create locust ConfigMap
-	@$(KUBECTL) -n loadtest create configmap locust --from-file=locustfile.py=./app-manifest/locustfile.py -o yaml --dry-run=client
+	@$(KUBECTL) -n loadtest create configmap locust --from-file=locustfile.py=./apps/common/loadtest/locustfile.py -o yaml --dry-run=client
 
 .PHONY: create-dashboard-configmaps
 create-dashboard-configmaps: ## Create dashbaord ConfigMaps
@@ -63,7 +64,11 @@ create-dashboard-configmaps: ## Create dashbaord ConfigMaps
 	@echo "Make sure to add label for grafana sidecar"
 	@echo
 
-.PHONY: apply-litmuscrds
+.PHONY: create-litmus-server-rbac-configmaps
+create-litmus-server-rbac-configmaps: ## Create litmus server rbac ConfigMaps
+	$(KUBECTL) -n litmus create configmap ka0s-manifests --from-file=./apps/common/litmus/manifests -o yaml --dry-run=client > ./apps/common/litmus/configmap-manifests.yaml
+
+.PHONY: apply-litmus-crds
 apply-litmus-crds: ## Apply litmus crds only. This is needed for litmusctl to deploy.
 	$(KUBECTL) apply -f https://github.com/litmuschaos/litmus/blob/release-2.14.0/litmus-portal/manifests/litmus-portal-crds.yml
 
@@ -72,6 +77,10 @@ apply-litmus-crds: ## Apply litmus crds only. This is needed for litmusctl to de
 workload-labels:
 	$(KUBECTL) -n $(LITMUS_NS) get deployments -o=json | jq '.items[] | {kind: .kind, name: .metadata.name, labels: .metadata.labels}'
 	$(KUBECTL) -n $(LITMUS_NS) get sts -o=json | jq '.items[] | {kind: .kind, name: .metadata.name, labels: .metadata.labels}'
+
+.PHONY: apply-mesh-sock-shop
+apply-mesh-sock-shop: ## Apply istio meshed sock shop
+	kustomize build apps/common/$(APP_FLAVOR)-sock-shop | istioctl kube-inject -f - | $(KUBECTL) apply -f
 
 # helm repo add metrics-server https://kubernetes-sigs.github.io/metrics-server
 .PHONY: install-metrics-server

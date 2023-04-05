@@ -1,0 +1,15 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ../weak-sock-shop
+patches:
+  - patch: |
+      apiVersion: apps/v1
+      metadata:
+        name: all
+      kind: Deployment
+      spec:
+        replicas: 2
+    target:
+      kind: Deployment
+      labelSelector: app=sock-shop

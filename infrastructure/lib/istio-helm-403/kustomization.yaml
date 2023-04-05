@@ -5,5 +5,5 @@ namespace: istio-system
 # - ../../base/istio
 resources:
   - ../../base/istio
-  - release-base.yaml
-  - release-istiod.yaml
+  - manifest-istio-base.yaml
+  - manifest-istiod.yaml

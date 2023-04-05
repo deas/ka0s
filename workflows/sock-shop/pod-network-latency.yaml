@@ -1,0 +1,57 @@
+apiVersion: litmuschaos.io/v1alpha1
+kind: ChaosEngine
+metadata:
+  name: network-latency-chaos
+  namespace: litmus # {{workflow.parameters.adminModeNamespace}}
+  #labels:
+  #  context: "sock-shop_catalogue" # "{{workflow.parameters.appNamespace}}_catalogue"
+spec:
+  appinfo:
+    appns: 'sock-shop'
+    applabel: 'name=catalogue'
+    appkind: 'deployment'
+  engineState: 'active'
+  chaosServiceAccount: litmus-admin
+  jobCleanUpPolicy: 'retain'
+  components:
+    runner:
+      imagePullPolicy: Always
+  experiments:
+    # Catalogue pod takes 3 minutes to get ready?
+    - name: pod-network-latency
+      spec:
+        probe:
+        - name: "check-catalogue-access-url"
+          type: "httpProbe"
+          httpProbe/inputs:
+            url: "http://front-end.sock-shop.svc.cluster.local:80/catalogue"
+            insecureSkipVerify: false
+            # responseTimeout: 4567
+            method:
+              get:
+                criteria: "=="
+                responseCode: "200"
+          mode: "Continuous"
+          runProperties:
+            probeTimeout: 5000 # Appears this overrides httpProbe/inputs/responseTimeout
+            interval: 1
+            retry: 0
+        # https://litmuschaos.github.io/litmus/experiments/categories/pods/pod-network-latency/#experiment-tunables
+        components:
+          env:
+            - name: TOTAL_CHAOS_DURATION
+              value: '30'
+            # set chaos interval (in sec) as desired
+            - name: CHAOS_INTERVAL
+              value: '10'
+            # pod failures without '--force' & default terminationGracePeriodSeconds
+            - name: FORCE
+              value: 'false'
+            - name: CONTAINER_RUNTIME
+              value: 'containerd'
+            - name: SOCKET_PATH
+              value: '/var/run/containerd/containerd.sock'
+            - name: NETWORK_LATENCY
+              value: "1000" # -> 4s
+            # - name: JITTER
+            #  value: "0"    

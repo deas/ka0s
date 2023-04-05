@@ -171,4 +171,9 @@ spec:
       #   version: 1
       service:
         type: LoadBalancer
+        port: 3000 # default is 80
+        annotations:
+          metallb.universe.tf/allow-shared-ip: "litmus-share"
+          # metallb.universe.tf/loadBalancerIPs: "172.18.255.200"
+
 

@@ -18,12 +18,14 @@ spec:
       - name: appNamespace
         value: "sock-shop"
       - name: appFlavour
-        value: resilient
+        value: "weak" # "weak"|"resilient"|"" - use "" to use an existing application
       - name: revertChaos
         value: true
       - name: socketPath
         value: /var/run/containerd/containerd.sock
         # value: /var/run/k3s/containerd/containerd.sock
+      - name: appBranch
+        value: wip
       - name: httpsProxy
         value: ""
         #valueFrom:
@@ -33,8 +35,10 @@ spec:
   templates:
     - name: argowf-chaos
       steps:
-        #- - name: install-application
-        #    template: install-application
+        - - name: install-application
+            template: install-application
+            # Blows up. Issue with litmus?
+            # when: "{{workflow.parameters.appFlavour}} != ''"
         - - name: install-chaos-experiments
             template: install-chaos-experiments
           - name: load-test
@@ -53,8 +57,10 @@ spec:
         - - name: revert-chaos
             template: revert-chaos
             when: "{{workflow.parameters.revertChaos}}"
-        #  - name: delete-application
-        #    template: delete-application
+          - name: delete-application
+            template: delete-application
+            # Blows up. Issue with litmus?
+            # when: "{{workflow.parameters.appFlavour}} != ''"
           - name: delete-loadtest
             template: delete-loadtest
 
@@ -66,27 +72,44 @@ spec:
       #      configMapKeyRef:
       #        name: enviroment-vars
       #        key: contenedor
-      # initContainers:
-      # - name: git
-      #   image: bitnami/git:latest
-      #   command: ["echo", "hello"]
-      #   mirrorVolumeMounts: true
       volumes:
         - name: src
           emptyDir: {}
-      container:
-        image: litmuschaos/k8s:latest # TODO: Does not have git ... yet
+      initContainers:
+      - name: git
+        image: bitnami/git:latest
         command: [sh, -c]
+        # command: ["echo", "hello"]
         args:
           - |
             set -e
             export GIT_SSL_NO_VERIFY=true
-            export KUBERNETES_SERVICE_HOST=kubernetes.default.svc.cluster.local
-            export NO_PROXY=.cluster.local
             if [ -n "{{workflow.parameters.httpsProxy}}" ] ; then
               export HTTPS_PROXY={{workflow.parameters.httpsProxy}}
             fi
-            curl -sk https://raw.githubusercontent.com/deas/ka0s/wip/app-manifest/{{workflow.parameters.appFlavour}}-sock-shop.yaml | kubectl apply -f -
+            # Workaround for `when`
+            if [ -n "{{workflow.parameters.appFlavour}}" ] ; then
+              git clone -b {{workflow.parameters.appBranch}} --depth 1 https://github.com/deas/ka0s /src/ka0s
+            fi  
+        mirrorVolumeMounts: true
+      # TODO: Actually, we want kustomize build ... | kubectl apply -f -
+      container:
+        image: litmuschaos/k8s:latest # TODO: Does not have git ... yet. Hence, we use initContainer
+        command: [sh, -c]
+        args:
+          - |
+            set -e
+            # Workaround for `when`
+            if [ -n "{{workflow.parameters.appFlavour}}" ] ; then
+              kubectl apply -f /src/ka0s/app-manifest/{{workflow.parameters.appFlavour}}-sock-shop.yaml
+            fi
+            # export GIT_SSL_NO_VERIFY=true
+            # export KUBERNETES_SERVICE_HOST=kubernetes.default.svc.cluster.local
+            # export NO_PROXY=.cluster.local
+            # if [ -n "{{workflow.parameters.httpsProxy}}" ] ; then
+            #   export HTTPS_PROXY={{workflow.parameters.httpsProxy}}
+            # fi
+            # curl -sk https://raw.githubusercontent.com/deas/ka0s/{{workflow.parameters.appBranch}}/app-manifest/{{workflow.parameters.appFlavour}}-sock-shop.yaml | kubectl apply -f -
         volumeMounts:
           - name: src
             mountPath: /src
@@ -481,19 +504,47 @@ spec:
         args: ["-file=/tmp/chaosengine.yaml","-saveName=/tmp/engine-name"]
 
     - name: delete-application
+      volumes:
+        - name: src
+          emptyDir: {}
+      initContainers:
+      - name: git
+        image: bitnami/git:latest
+        command: [sh, -c]
+        # command: ["echo", "hello"]
+        args:
+          - |
+            set -e
+            export GIT_SSL_NO_VERIFY=true
+            if [ -n "{{workflow.parameters.httpsProxy}}" ] ; then
+              export HTTPS_PROXY={{workflow.parameters.httpsProxy}}
+            fi
+            # Workaround for `when`
+            if [ -n "{{workflow.parameters.appFlavour}}" ] ; then
+              git clone -b {{workflow.parameters.appBranch}} --depth 1 https://github.com/deas/ka0s /src/ka0s
+            fi  
+        mirrorVolumeMounts: true
+      # TODO: Actually, we want kustomize build ... | kubectl delete -f -
       container:
         image: litmuschaos/k8s:latest
         command: [sh, -c]
         args:
           - |
             set -e
-            export GIT_SSL_NO_VERIFY=true
-            export KUBERNETES_SERVICE_HOST=kubernetes.default.svc.cluster.local
-            export NO_PROXY=.cluster.local
-            if [ -n "{{workflow.parameters.httpsProxy}}" ] ; then
-              export HTTPS_PROXY={{workflow.parameters.httpsProxy}}
+            # Workaround for `when`
+            if [ -n "{{workflow.parameters.appFlavour}}" ] ; then
+              kubectl delete -f /src/ka0s/app-manifest/{{workflow.parameters.appFlavour}}-sock-shop.yaml
             fi
-            curl -sk https://raw.githubusercontent.com/deas/ka0s/wip/app-manifest/{{workflow.parameters.appFlavour}}-sock-shop.yaml | kubectl apply -f -  
+            # export GIT_SSL_NO_VERIFY=true
+            # export KUBERNETES_SERVICE_HOST=kubernetes.default.svc.cluster.local
+            # export NO_PROXY=.cluster.local
+            # if [ -n "{{workflow.parameters.httpsProxy}}" ] ; then
+            #  export HTTPS_PROXY={{workflow.parameters.httpsProxy}}
+            # fi
+            # curl -sk https://raw.githubusercontent.com/deas/ka0s/{{workflow.parameters.appBranch}}/app-manifest/{{workflow.parameters.appFlavour}}-sock-shop.yaml | kubectl delete -f -
+        volumeMounts:
+          - name: src
+            mountPath: /src
       #container:
       #  image: litmuschaos/litmus-app-deployer:latest
       #  args: ["-namespace={{workflow.parameters.appNamespace}}","-typeName=resilient","-operation=delete", "-app=sock-shop"]
@@ -510,8 +561,10 @@ spec:
             if [ -n "{{workflow.parameters.httpsProxy}}" ] ; then
               export HTTPS_PROXY={{workflow.parameters.httpsProxy}}
             fi
-            curl -sk https://raw.githubusercontent.com/deas/ka0s/wip/app-manifest/loadtest.yaml | kubectl apply -f -
-            kubectl -n loadtest --timeout=300s wait --for=condition=available deployment -l app=loadtest
+            curl -sk https://raw.githubusercontent.com/deas/ka0s/{{workflow.parameters.appBranch}}/apps/common/loadtest/locust.yaml | kubectl apply -f -
+            # TODO: Error from server (Forbidden): deployments.apps is forbidden: User 'system:serviceaccount:litmus:argo-chaos' cannot list resource 'deployments' in API group 'apps' in the namespace 'loadtest'
+            # kubectl -n loadtest --timeout=300s wait --for=condition=available deployment -l app=loadtest
+            sleep 30 # hack
       #  image: litmuschaos/litmus-app-deployer:latest
       #  args: ["-namespace=loadtest", "-app=loadtest"]
 
@@ -528,7 +581,7 @@ spec:
            if [ -n "{{workflow.parameters.httpsProxy}}" ] ; then
               export HTTPS_PROXY={{workflow.parameters.httpsProxy}}
            fi
-           curl -sk https://raw.githubusercontent.com/deas/ka0s/wip/app-manifest/loadtest.yaml | kubectl delete -f -
+           curl -sk https://raw.githubusercontent.com/deas/ka0s/{{workflow.parameters.appBranch}}/apps/common/loadtest/locust.yaml | kubectl delete -f -
         # image: litmuschaos/litmus-app-deployer:latest
         # args: ["-namespace=loadtest","-operation=delete", "-app=loadtest"]
     

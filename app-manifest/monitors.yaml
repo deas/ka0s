@@ -1,0 +1,185 @@
+# Name: "catalogue", Namespace: "sock-shop"
+# TODO: from server for: "/src/ka0s/app-manifest/weak-sock-shop.yaml": servicemonitors.monitoring.coreos.com "catalogue" is forbidden: User "system:serviceaccount:litmus:argo-chaos" cannot get resource "servicemonitors" in API group "monitoring.coreos.com" in the namespace "sock-shop"
+# chaos-cluster-role
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  annotations: {}
+  labels:
+    app: sock-shop
+    release: prometheus
+  name: front-end
+  namespace: sock-shop
+spec:
+  endpoints:
+  - interval: 30s
+    # port: "80"
+    targetPort: 8079
+    path: "/metrics"
+    relabelings:
+      - sourceLabels: [__meta_kubernetes_service_name]
+        targetLabel: name
+        regex: (.*)  
+  jobLabel: front-end
+  namespaceSelector:
+    matchNames:
+    - sock-shop
+  selector:
+    matchLabels:
+      name: front-end
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  annotations: {}
+  labels:
+    app: sock-shop
+    release: prometheus
+  name: orders
+  namespace: sock-shop
+spec:
+  endpoints:
+  - interval: 30s
+    targetPort: 80
+    path: "/metrics"
+    relabelings:
+      - sourceLabels: [__meta_kubernetes_service_name]
+        targetLabel: name
+        regex: (.*)  
+  jobLabel: order
+  namespaceSelector:
+    matchNames:
+    - sock-shop
+  selector:
+    matchLabels:
+      name: orders
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  annotations: {}
+  labels:
+    app: sock-shop
+    release: prometheus
+  name: carts
+  namespace: sock-shop
+spec:
+  endpoints:
+  - interval: 30s
+    targetPort: 80
+    path: "/metrics"
+    relabelings:
+      - sourceLabels: [__meta_kubernetes_service_name]
+        targetLabel: name
+        regex: (.*)  
+  jobLabel: carts
+  namespaceSelector:
+    matchNames:
+    - sock-shop
+  selector:
+    matchLabels:
+      name: carts
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  annotations: {}
+  labels:
+    app: sock-shop
+    release: prometheus
+  name: payment
+  namespace: sock-shop
+spec:
+  endpoints:
+  - interval: 30s
+    targetPort: 80
+    path: "/metrics"
+    relabelings:
+      - sourceLabels: [__meta_kubernetes_service_name]
+        targetLabel: name
+        regex: (.*)  
+  jobLabel: payment
+  namespaceSelector:
+    matchNames:
+    - sock-shop
+  selector:
+    matchLabels:
+      name: payment
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  annotations: {}
+  labels:
+    app: sock-shop
+    release: prometheus
+  name: shipping
+  namespace: sock-shop
+spec:
+  endpoints:
+  - interval: 30s
+    targetPort: 80
+    path: "/metrics"
+    relabelings:
+      - sourceLabels: [__meta_kubernetes_service_name]
+        targetLabel: name
+        regex: (.*)  
+  jobLabel: shipping
+  namespaceSelector:
+    matchNames:
+    - sock-shop
+  selector:
+    matchLabels:
+      name: shipping
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  annotations: {}
+  labels:
+    app: sock-shop
+    release: prometheus
+  name: user
+  namespace: sock-shop
+spec:
+  endpoints:
+  - interval: 30s
+    targetPort: 80
+    path: "/metrics"
+    relabelings:
+      - sourceLabels: [__meta_kubernetes_service_name]
+        targetLabel: name
+        regex: (.*)  
+  jobLabel: user
+  namespaceSelector:
+    matchNames:
+    - sock-shop
+  selector:
+    matchLabels:
+      name: user
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  annotations: {}
+  labels:
+    app: sock-shop
+    release: prometheus
+  name: catalogue
+  namespace: sock-shop
+spec:
+  endpoints:
+  - interval: 30s
+    targetPort: 80
+    path: "/metrics"
+    relabelings:
+      - sourceLabels: [__meta_kubernetes_service_name]
+        targetLabel: name
+        regex: (.*)  
+  jobLabel: catalogue
+  namespaceSelector:
+    matchNames:
+    - sock-shop
+  selector:
+    matchLabels:
+      name: catalogue

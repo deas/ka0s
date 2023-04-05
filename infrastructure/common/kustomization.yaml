@@ -3,7 +3,7 @@ kind: Kustomization
 resources:
   - ../lib/sources
   - ../lib/observability
-  - ../lib/istio
-  - ../lib/istio-ingress
+  - ../lib/istio-helm-403
+  - ../lib/istio-ingress-helm-403
   - ../lib/knative
 #  - ../lib/ww-gitops

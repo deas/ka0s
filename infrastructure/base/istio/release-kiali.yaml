@@ -23,7 +23,7 @@ spec:
   values:
     deployment:
       service_type: LoadBalancer
-      # service_annotations:
-      #   metallb.universe.tf/allow-shared-ip: "litmus-share"
-      #   # metallb.universe.tf/loadBalancerIPs: "172.18.255.200"
+      service_annotations:
+        metallb.universe.tf/allow-shared-ip: "litmus-share"
+        # metallb.universe.tf/loadBalancerIPs: "172.18.255.200"
 
