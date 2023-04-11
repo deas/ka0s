@@ -564,7 +564,7 @@ spec:
             curl -sk https://raw.githubusercontent.com/deas/ka0s/{{workflow.parameters.appBranch}}/apps/common/loadtest/locust.yaml | kubectl apply -f -
             # TODO: Error from server (Forbidden): deployments.apps is forbidden: User 'system:serviceaccount:litmus:argo-chaos' cannot list resource 'deployments' in API group 'apps' in the namespace 'loadtest'
             # kubectl -n loadtest --timeout=300s wait --for=condition=available deployment -l app=loadtest
-            sleep 30 # hack
+            sleep 30 # TODO: Hack, use wait kubectl wait now
       #  image: litmuschaos/litmus-app-deployer:latest
       #  args: ["-namespace=loadtest", "-app=loadtest"]
 

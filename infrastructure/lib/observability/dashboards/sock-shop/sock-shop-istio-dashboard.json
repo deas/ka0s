@@ -98,7 +98,7 @@
       "steppedLine": true,
       "targets": [
         {
-          "expr": "heptio_eventrouter_normal_total{reason=\"ChaosInject\",involved_object_name=~\"pod-cpu-hog-.*\", involved_object_namespace=\"litmus\", involved_object_kind=\"ChaosEngine\"} - on () (heptio_eventrouter_normal_total{reason=\"PostChaosCheck\",involved_object_name=~\"pod-cpu-hog-.*\", involved_object_namespace=\"litmus\", involved_object_kind=\"ChaosEngine\"} OR on() vector(0))",
+          "expr": "heptio_eventrouter_normal_total{reason=\"ChaosInject\",involved_object_name=~\"pod-cpu-hog.*\", involved_object_namespace=\"litmus\", involved_object_kind=\"ChaosEngine\"} - on () (heptio_eventrouter_normal_total{reason=\"PostChaosCheck\",involved_object_name=~\"pod-cpu-hog-.*\", involved_object_namespace=\"litmus\", involved_object_kind=\"ChaosEngine\"} OR on() vector(0))",
           "format": "time_series",
           "instant": false,
           "interval": "",
@@ -108,7 +108,7 @@
           "step": 2
         },
         {
-          "expr": "heptio_eventrouter_normal_total{reason=\"ChaosInject\",involved_object_name=~\"pod-memory-hog-.*\", involved_object_namespace=\"litmus\", involved_object_kind=\"ChaosEngine\"} - on () (heptio_eventrouter_normal_total{reason=\"PostChaosCheck\",involved_object_name=~\"pod-memory-hog-.*\", involved_object_namespace=\"litmus\", involved_object_kind=\"ChaosEngine\"} OR on() vector(0))",
+          "expr": "heptio_eventrouter_normal_total{reason=\"ChaosInject\",involved_object_name=~\"pod-memory-hog.*\", involved_object_namespace=\"litmus\", involved_object_kind=\"ChaosEngine\"} - on () (heptio_eventrouter_normal_total{reason=\"PostChaosCheck\",involved_object_name=~\"pod-memory-hog-.*\", involved_object_namespace=\"litmus\", involved_object_kind=\"ChaosEngine\"} OR on() vector(0))",
           "format": "time_series",
           "instant": false,
           "interval": "",
@@ -505,14 +505,14 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "sum(rate(request_duration_seconds_count{name=\"orders\",status_code=~\"2..\",route!=\"metrics\"}[1m])) * 100",
+          "expr": "sum(rate(istio_request_duration_milliseconds_count{destination_service_name=\"orders\",response_code=~\"2..\"}[1m])) * 100",
           "intervalFactor": 2,
           "legendFormat": "2xx",
           "refId": "A",
           "step": 2
         },
         {
-          "expr": "sum(rate(request_duration_seconds_count{name=\"orders\",status_code=~\"4.+|5.+\"}[1m])) * 100",
+          "expr": "sum(rate(istio_request_duration_milliseconds_count{destination_service_name=\"orders\",response_code=~\"4.+|5.+\"}[1m])) * 100",
           "intervalFactor": 2,
           "legendFormat": "4xx/5xx",
           "refId": "B",
@@ -634,21 +634,21 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "histogram_quantile(0.99, sum(rate(request_duration_seconds_bucket{name=\"orders\"}[1m])) by (name, le))",
+          "expr": "histogram_quantile(0.99, sum(rate(istio_request_duration_milliseconds_bucket{destination_service_name=\"orders\"}[1m])) by (destination_service_name, le))",
           "intervalFactor": 2,
           "legendFormat": "99th quantile",
           "refId": "A",
           "step": 2
         },
         {
-          "expr": "histogram_quantile(0.5, sum(rate(request_duration_seconds_bucket{name=\"orders\"}[1m])) by (name, le))",
+          "expr": "histogram_quantile(0.5, sum(rate(istio_request_duration_milliseconds_bucket{destination_service_name=\"orders\"}[1m])) by (destination_service_name, le))",
           "intervalFactor": 2,
           "legendFormat": "50th quantile",
           "refId": "B",
           "step": 2
         },
         {
-          "expr": "sum(rate(request_duration_seconds_sum{name=\"orders\"}[1m])) / sum(rate(request_duration_seconds_count{name=\"orders\"}[1m]))",
+          "expr": "sum(rate(request_duration_seconds_sum{destination_service_name=\"orders\"}[1m])) / sum(rate(istio_request_duration_milliseconds_count{destination_service_name=\"orders\"}[1m]))",
           "intervalFactor": 2,
           "legendFormat": "Mean",
           "refId": "C",
@@ -681,7 +681,7 @@
       },
       "yaxes": [
         {
-          "format": "s",
+          "format": "ms",
           "logBase": 1,
           "min": 0,
           "show": true
@@ -778,14 +778,14 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "sum(rate(request_duration_seconds_count{name=\"catalogue\",status_code=~\"2..\",route!=\"metrics\"}[1m])) * 100",
+          "expr": "sum(rate(istio_request_duration_milliseconds_count{destination_service_name=\"catalogue\",response_code=~\"2..\"}[1m])) * 100",
           "intervalFactor": 2,
           "legendFormat": "2xx",
           "refId": "A",
           "step": 2
         },
         {
-          "expr": "sum(rate(request_duration_seconds_count{name=\"catalogue\",status_code=~\"4.+|5.+\"}[1m])) * 100",
+          "expr": "sum(rate(istio_request_duration_milliseconds_count{destination_service_name=\"catalogue\",response_code=~\"4.+|5.+\"}[1m])) * 100",
           "intervalFactor": 2,
           "legendFormat": "4xx/5xx",
           "refId": "B",
@@ -908,28 +908,28 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "histogram_quantile(0.99, sum(rate(request_duration_seconds_bucket{name=\"catalogue\"}[1m])) by (name, le))",
+          "expr": "histogram_quantile(0.99, sum(rate(istio_request_duration_milliseconds_bucket{destination_service_name=\"catalogue\"}[1m])) by (destination_service_name, le))",
           "intervalFactor": 2,
           "legendFormat": "99th quantile",
           "refId": "A",
           "step": 2
         },
         {
-          "expr": "histogram_quantile(0.5, sum(rate(request_duration_seconds_bucket{name=\"catalogue\"}[1m])) by (name, le))",
+          "expr": "histogram_quantile(0.5, sum(rate(istio_request_duration_milliseconds_bucket{destination_service_name=\"catalogue\"}[1m])) by (destination_service_name, le))",
           "intervalFactor": 2,
           "legendFormat": "50th quantile",
           "refId": "B",
           "step": 2
         },
         {
-          "expr": "sum(rate(request_duration_seconds_sum{name=\"catalogue\"}[1m])) / sum(rate(request_duration_seconds_count{name=\"catalogue\"}[1m]))",
+          "expr": "sum(rate(request_duration_seconds_sum{destination_service_name=\"catalogue\"}[1m])) / sum(rate(istio_request_duration_milliseconds_count{destination_service_name=\"catalogue\"}[1m]))",
           "intervalFactor": 2,
           "legendFormat": "Mean",
           "refId": "C",
           "step": 2
         },
         {
-          "expr": "heptio_eventrouter_normal_total{reason=\"ChaosInject\",involved_object_name=~\"pod-cpu-hog-.*\", involved_object_namespace=\"litmus\", involved_object_kind=\"ChaosEngine\"} - on () (heptio_eventrouter_normal_total{reason=\"PostChaosCheck\",involved_object_name=~\"pod-cpu-hog-.*\", involved_object_namespace=\"litmus\", involved_object_kind=\"ChaosEngine\"} OR on() vector(0))",
+          "expr": "heptio_eventrouter_normal_total{reason=\"ChaosInject\",involved_object_name=~\"pod-cpu-hog.*\", involved_object_namespace=\"litmus\", involved_object_kind=\"ChaosEngine\"} - on () (heptio_eventrouter_normal_total{reason=\"PostChaosCheck\",involved_object_name=~\"pod-cpu-hog-.*\", involved_object_namespace=\"litmus\", involved_object_kind=\"ChaosEngine\"} OR on() vector(0))",
           "interval": "",
           "legendFormat": "Chaos Period",
           "refId": "D"
@@ -955,7 +955,7 @@
       },
       "yaxes": [
         {
-          "format": "s",
+          "format": "ms",
           "logBase": 1,
           "min": 0,
           "show": true
@@ -1037,14 +1037,14 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "sum(rate(request_duration_seconds_count{name=\"payment\",status_code=~\"2..\",route!=\"metrics\"}[1m])) * 100",
+          "expr": "sum(rate(istio_request_duration_milliseconds_count{destination_service_name=\"payment\",response_code=~\"2..\"}[1m])) * 100",
           "intervalFactor": 2,
           "legendFormat": "2xx",
           "refId": "A",
           "step": 2
         },
         {
-          "expr": "sum(rate(request_duration_seconds_count{name=\"payment\",status_code=~\"4.+|5.+\"}[1m])) * 100",
+          "expr": "sum(rate(istio_request_duration_milliseconds_count{destination_service_name=\"payment\",response_code=~\"4.+|5.+\"}[1m])) * 100",
           "intervalFactor": 2,
           "legendFormat": "4xx/5xx",
           "refId": "B",
@@ -1136,21 +1136,21 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "histogram_quantile(0.99, sum(rate(request_duration_seconds_bucket{name=\"payment\"}[1m])) by (name, le))",
+          "expr": "histogram_quantile(0.99, sum(rate(istio_request_duration_milliseconds_bucket{destination_service_name=\"payment\"}[1m])) by (destination_service_name, le))",
           "intervalFactor": 2,
           "legendFormat": "99th quantile",
           "refId": "A",
           "step": 2
         },
         {
-          "expr": "histogram_quantile(0.5, sum(rate(request_duration_seconds_bucket{name=\"payment\"}[1m])) by (name, le))",
+          "expr": "histogram_quantile(0.5, sum(rate(istio_request_duration_milliseconds_bucket{destination_service_name=\"payment\"}[1m])) by (destination_service_name, le))",
           "intervalFactor": 2,
           "legendFormat": "50th quantile",
           "refId": "B",
           "step": 2
         },
         {
-          "expr": "sum(rate(request_duration_seconds_sum{name=\"payment\"}[1m])) / sum(rate(request_duration_seconds_count{name=\"payment\"}[1m]))",
+          "expr": "sum(rate(request_duration_seconds_sum{destination_service_name=\"payment\"}[1m])) / sum(rate(istio_request_duration_milliseconds_count{destination_service_name=\"payment\"}[1m]))",
           "intervalFactor": 2,
           "legendFormat": "Mean",
           "refId": "C",
@@ -1177,7 +1177,7 @@
       },
       "yaxes": [
         {
-          "format": "s",
+          "format": "ms",
           "logBase": 1,
           "min": 0,
           "show": true
@@ -1252,14 +1252,14 @@
           "steppedLine": false,
           "targets": [
             {
-              "expr": "sum(rate(request_duration_seconds_count{name=\"shipping\",status_code=~\"2..\",route!=\"metrics\"}[1m])) * 100",
+              "expr": "sum(rate(istio_request_duration_milliseconds_count{destination_service_name=\"shipping\",response_code=~\"2..\"}[1m])) * 100",
               "intervalFactor": 2,
               "legendFormat": "2xx",
               "refId": "A",
               "step": 10
             },
             {
-              "expr": "sum(rate(request_duration_seconds_count{name=\"shipping\",status_code=~\"4.+|5.+\"}[1m])) * 100",
+              "expr": "sum(rate(istio_request_duration_milliseconds_count{destination_service_name=\"shipping\",response_code=~\"4.+|5.+\"}[1m])) * 100",
               "intervalFactor": 2,
               "legendFormat": "4xx/5xx",
               "refId": "B",
@@ -1351,21 +1351,21 @@
           "steppedLine": false,
           "targets": [
             {
-              "expr": "histogram_quantile(0.99, sum(rate(request_duration_seconds_bucket{name=\"shipping\"}[1m])) by (name, le))",
+              "expr": "histogram_quantile(0.99, sum(rate(istio_request_duration_milliseconds_bucket{destination_service_name=\"shipping\"}[1m])) by (destination_service_name, le))",
               "intervalFactor": 2,
               "legendFormat": "99th quantile",
               "refId": "A",
               "step": 10
             },
             {
-              "expr": "histogram_quantile(0.5, sum(rate(request_duration_seconds_bucket{name=\"shipping\"}[1m])) by (name, le))",
+              "expr": "histogram_quantile(0.5, sum(rate(istio_request_duration_milliseconds_bucket{destination_service_name=\"shipping\"}[1m])) by (destination_service_name, le))",
               "intervalFactor": 2,
               "legendFormat": "50th quantile",
               "refId": "B",
               "step": 10
             },
             {
-              "expr": "sum(rate(request_duration_seconds_sum{name=\"shipping\"}[1m])) / sum(rate(request_duration_seconds_count{name=\"shipping\"}[1m]))",
+              "expr": "sum(rate(request_duration_seconds_sum{destination_service_name=\"shipping\"}[1m])) / sum(rate(istio_request_duration_milliseconds_count{destination_service_name=\"shipping\"}[1m]))",
               "intervalFactor": 2,
               "legendFormat": "Mean",
               "refId": "C",
@@ -1392,7 +1392,7 @@
           },
           "yaxes": [
             {
-              "format": "s",
+              "format": "ms",
               "logBase": 1,
               "min": 0,
               "show": true
@@ -1472,14 +1472,14 @@
           "steppedLine": false,
           "targets": [
             {
-              "expr": "sum(rate(request_duration_seconds_count{name=\"user\",status_code=~\"2..\",route!=\"metrics\"}[1m])) * 100",
+              "expr": "sum(rate(istio_request_duration_milliseconds_count{destination_service_name=\"user\",response_code=~\"2..\"}[1m])) * 100",
               "intervalFactor": 2,
               "legendFormat": "2xx",
               "refId": "A",
               "step": 10
             },
             {
-              "expr": "sum(rate(request_duration_seconds_count{name=\"user\",status_code=~\"4.+|5.+\"}[1m])) * 100",
+              "expr": "sum(rate(istio_request_duration_milliseconds_count{destination_service_name=\"user\",response_code=~\"4.+|5.+\"}[1m])) * 100",
               "intervalFactor": 2,
               "legendFormat": "4xx/5xx",
               "refId": "B",
@@ -1571,21 +1571,21 @@
           "steppedLine": false,
           "targets": [
             {
-              "expr": "histogram_quantile(0.99, sum(rate(request_duration_seconds_bucket{name=\"user\"}[1m])) by (name, le))",
+              "expr": "histogram_quantile(0.99, sum(rate(istio_request_duration_milliseconds_bucket{destination_service_name=\"user\"}[1m])) by (destination_service_name, le))",
               "intervalFactor": 2,
               "legendFormat": "99th quantile",
               "refId": "A",
               "step": 10
             },
             {
-              "expr": "histogram_quantile(0.5, sum(rate(request_duration_seconds_bucket{name=\"user\"}[1m])) by (name, le))",
+              "expr": "histogram_quantile(0.5, sum(rate(istio_request_duration_milliseconds_bucket{destination_service_name=\"user\"}[1m])) by (destination_service_name, le))",
               "intervalFactor": 2,
               "legendFormat": "50th quantile",
               "refId": "B",
               "step": 10
             },
             {
-              "expr": "sum(rate(request_duration_seconds_sum{name=\"user\"}[1m])) / sum(rate(request_duration_seconds_count{name=\"user\"}[1m]))",
+              "expr": "sum(rate(request_duration_seconds_sum{destination_service_name=\"user\"}[1m])) / sum(rate(istio_request_duration_milliseconds_count{destination_service_name=\"user\"}[1m]))",
               "intervalFactor": 2,
               "legendFormat": "Mean",
               "refId": "C",
@@ -1612,7 +1612,7 @@
           },
           "yaxes": [
             {
-              "format": "s",
+              "format": "ms",
               "logBase": 1,
               "min": 0,
               "show": true
@@ -1692,14 +1692,14 @@
           "steppedLine": false,
           "targets": [
             {
-              "expr": "sum(rate(request_duration_seconds_count{name=\"front-end\",status_code=~\"2..\",route!=\"metrics\"}[1m])) * 100",
+              "expr": "sum(rate(istio_request_duration_milliseconds_count{destination_service_name=\"front-end\",response_code=~\"2..\"}[1m])) * 100",
               "intervalFactor": 2,
               "legendFormat": "2xx",
               "refId": "A",
               "step": 10
             },
             {
-              "expr": "sum(rate(request_duration_seconds_count{name=\"front-end\",status_code=~\"4.+|5.+\"}[1m])) * 100",
+              "expr": "sum(rate(istio_request_duration_milliseconds_count{destination_service_name=\"front-end\",response_code=~\"4.+|5.+\"}[1m])) * 100",
               "intervalFactor": 2,
               "legendFormat": "4xx/5xx",
               "refId": "B",
@@ -1791,21 +1791,21 @@
           "steppedLine": false,
           "targets": [
             {
-              "expr": "histogram_quantile(0.99, sum(rate(request_duration_seconds_bucket{name=\"front-end\"}[1m])) by (name, le))",
+              "expr": "histogram_quantile(0.99, sum(rate(istio_request_duration_milliseconds_bucket{destination_service_name=\"front-end\"}[1m])) by (destination_service_name, le))",
               "intervalFactor": 2,
               "legendFormat": "99th quantile",
               "refId": "A",
               "step": 10
             },
             {
-              "expr": "histogram_quantile(0.5, sum(rate(request_duration_seconds_bucket{name=\"front-end\"}[1m])) by (name, le))",
+              "expr": "histogram_quantile(0.5, sum(rate(istio_request_duration_milliseconds_bucket{destination_service_name=\"front-end\"}[1m])) by (destination_service_name, le))",
               "intervalFactor": 2,
               "legendFormat": "50th quantile",
               "refId": "B",
               "step": 10
             },
             {
-              "expr": "sum(rate(request_duration_seconds_sum{name=\"front-end\"}[1m])) / sum(rate(request_duration_seconds_count{name=\"front-end\"}[1m]))",
+              "expr": "sum(rate(request_duration_seconds_sum{destination_service_name=\"front-end\"}[1m])) / sum(rate(istio_request_duration_milliseconds_count{destination_service_name=\"front-end\"}[1m]))",
               "intervalFactor": 2,
               "legendFormat": "Mean",
               "refId": "C",
@@ -1832,7 +1832,7 @@
           },
           "yaxes": [
             {
-              "format": "s",
+              "format": "ms",
               "logBase": 1,
               "min": 0,
               "show": true
@@ -1912,14 +1912,14 @@
           "steppedLine": false,
           "targets": [
             {
-              "expr": "sum(rate(request_duration_seconds_count{name=\"carts\",status_code=~\"2..\",route!=\"metrics\"}[1m])) * 100",
+              "expr": "sum(rate(istio_request_duration_milliseconds_count{destination_service_name=\"carts\",response_code=~\"2..\"}[1m])) * 100",
               "intervalFactor": 2,
               "legendFormat": "2xx",
               "refId": "A",
               "step": 10
             },
             {
-              "expr": "sum(rate(request_duration_seconds_count{name=\"carts\",status_code=~\"4.+|5.+\"}[1m])) * 100",
+              "expr": "sum(rate(istio_request_duration_milliseconds_count{destination_service_name=\"carts\",response_code=~\"4.+|5.+\"}[1m])) * 100",
               "intervalFactor": 2,
               "legendFormat": "4xx/5xx",
               "refId": "B",
@@ -2011,21 +2011,21 @@
           "steppedLine": false,
           "targets": [
             {
-              "expr": "histogram_quantile(0.99, sum(rate(request_duration_seconds_bucket{name=\"carts\"}[1m])) by (name, le))",
+              "expr": "histogram_quantile(0.99, sum(rate(istio_request_duration_milliseconds_bucket{destination_service_name=\"carts\"}[1m])) by (destination_service_name, le))",
               "intervalFactor": 2,
               "legendFormat": "99th quantile",
               "refId": "A",
               "step": 10
             },
             {
-              "expr": "histogram_quantile(0.5, sum(rate(request_duration_seconds_bucket{name=\"carts\"}[1m])) by (name, le))",
+              "expr": "histogram_quantile(0.5, sum(rate(istio_request_duration_milliseconds_bucket{destination_service_name=\"carts\"}[1m])) by (destination_service_name, le))",
               "intervalFactor": 2,
               "legendFormat": "50th quantile",
               "refId": "B",
               "step": 10
             },
             {
-              "expr": "sum(rate(request_duration_seconds_sum{name=\"carts\"}[1m])) / sum(rate(request_duration_seconds_count{name=\"carts\"}[1m]))",
+              "expr": "sum(rate(request_duration_seconds_sum{destination_service_name=\"carts\"}[1m])) / sum(rate(istio_request_duration_milliseconds_count{destination_service_name=\"carts\"}[1m]))",
               "intervalFactor": 2,
               "legendFormat": "Mean",
               "refId": "C",
@@ -2052,7 +2052,7 @@
           },
           "yaxes": [
             {
-              "format": "s",
+              "format": "ms",
               "logBase": 1,
               "min": 0,
               "show": true
@@ -2100,7 +2100,6 @@
     "time_options": ["5m", "15m", "1h", "6h", "12h", "24h", "2d", "7d", "30d"]
   },
   "timezone": "browser",
-  "title": "Sock-Shop Performance",
-  "uid": "paRJzVnGk",
+  "title": "Sock-Shop Istio Performance",
   "version": 6
 }

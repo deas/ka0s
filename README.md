@@ -16,7 +16,7 @@ This repo is derived from [flux-conductr](https://github.com/deas/flux-conductr)
 - [LitmusChaos](https://litmuschaos.io/) platform
 - This repo acts as a ChaosHub
 - We serve the [Sock Shop Microservices Demo Application](https://microservices-demo.github.io/) as a scenario (defaulting to `containerd` experiments)
-- Prometheus Stack including Grafana provisioned for the Sock Shop Appliation
+- Tightly integrated Prometheus Stack including Grafana provisioned for the Sock Shop Appliation
 - Loki
 - Istio Eventing/Serving/Tracing (zipkin)
 - Knative
@@ -96,7 +96,8 @@ The following ports are used:
 - `9091` : Litmus Portal
 - `9002` : Litmus Server (for remote agents)
 - `3000` : Grafana
-- `20001` : Kiali (Istio)
+- `9411` : Zipkin (Mesh/Tracing)
+- `20001` : Kiali (Mesh/Istio)
 
 Acting as a ChaosHub, this repo serves the `sock-shop` [scenario/workflow](./workflows/sock-shop/workflow.yaml)
 
@@ -110,8 +111,8 @@ Litmus : `admin` / `litmus`.
 - Leverage Istio for failure injection?
 - This repo can act as a ChaosHub - add it during setup
 - Add first class support for `mitmproxy` (ship deployment)
-- Add first class support for remote agent?
-- Try GitOps scenarios?
+- ~~Add first class support for remote agent?~~
+- ~~Try GitOps scenarios?~~
 - Add this repo (as branch here - just like `gh_pages`?)
 - Manifests Naming
 - Fix annoying terraform plan ` yaml_incluster`
@@ -120,10 +121,11 @@ Litmus : `admin` / `litmus`.
 - Add mongodb/prometheus convenience (e.g. auth) targets to `Makefile`
 - Test drive 3.0-beta
 - Introduce kubeconfig module so we don't rely on environment w/o `kind`
-- `disk-fill` does not yet play with containerd
+- `disk-fill` does not yet play with containerd?
 - Catchup scheduled sock-shop workflow
 - Try Prometheus alerts
 - How would eBPF/Cilium help?
+- Recover chaos "enabled" in Sock Shop Dashboard
 - ~~Introduce istio based tracing~~
 
 ## Known Issues

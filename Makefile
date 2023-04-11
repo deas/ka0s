@@ -57,7 +57,7 @@ create-locust-configmap: ## Create locust ConfigMap
 	@$(KUBECTL) -n loadtest create configmap locust --from-file=locustfile.py=./apps/common/loadtest/locustfile.py -o yaml --dry-run=client
 
 .PHONY: create-dashboard-configmaps
-create-dashboard-configmaps: ## Create dashbaord ConfigMaps
+create-dashboard-configmaps: ## Create dashboard ConfigMaps
 #	$(KUBECTL) -n monitoring create configmap dashboards-istio --from-file=./infrastructure/lib/observability/dashboards/istio -o yaml --dry-run=client > ./infrastructure/lib/observability/configmap-dashboards-istio.yaml
 	$(KUBECTL) -n monitoring create configmap dashboards-sock-shop --from-file=./infrastructure/lib/observability/dashboards/sock-shop -o yaml --dry-run=client > ./infrastructure/lib/observability/configmap-dashboards-sock-shop.yaml
 	@echo
@@ -80,7 +80,7 @@ workload-labels:
 
 .PHONY: apply-mesh-sock-shop
 apply-mesh-sock-shop: ## Apply istio meshed sock shop
-	kustomize build apps/common/$(APP_FLAVOR)-sock-shop | istioctl kube-inject -f - | $(KUBECTL) apply -f
+	kustomize build apps/common/$(APP_FLAVOR)-sock-shop | istioctl kube-inject -f - | $(KUBECTL) apply -f -
 
 # helm repo add metrics-server https://kubernetes-sigs.github.io/metrics-server
 .PHONY: install-metrics-server

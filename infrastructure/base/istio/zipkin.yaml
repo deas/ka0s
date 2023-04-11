@@ -33,13 +33,17 @@ kind: Service
 metadata:
   name: tracing
   namespace: istio-system
+  annotations:
+    metallb.universe.tf/allow-shared-ip: "litmus-share"
   labels:
     app: zipkin
 spec:
-  type: ClusterIP
+  # type: ClusterIP
+  type: LoadBalancer
   ports:
     - name: http-query
-      port: 80
+      # port: 80
+      port: 9411
       protocol: TCP
       targetPort: 9411
   selector:
