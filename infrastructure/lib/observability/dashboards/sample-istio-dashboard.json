@@ -79,7 +79,7 @@
       "renderer": "flot",
       "seriesOverrides": [
         {
-          "alias": "catalogue-cpu-hog",
+          "alias": "sample-cpu-hog",
           "color": "#96D98D",
           "fillGradient": 5,
           "stack": "A",
@@ -98,12 +98,12 @@
       "steppedLine": true,
       "targets": [
         {
-          "expr": "heptio_eventrouter_normal_total{reason=\"ChaosInject\",involved_object_name=\"catalogue-cpu-hog\", involved_object_namespace=\"litmus\", involved_object_kind=\"ChaosEngine\"} - on () (heptio_eventrouter_normal_total{reason=\"PostChaosCheck\",involved_object_name=\"catalogue-cpu-hog\", involved_object_namespace=\"litmus\", involved_object_kind=\"ChaosEngine\"} OR on() vector(0))",
+          "expr": "heptio_eventrouter_normal_total{reason=\"ChaosInject\",involved_object_name=\"sample-cpu-hog\", involved_object_namespace=\"litmus\", involved_object_kind=\"ChaosEngine\"} - on () (heptio_eventrouter_normal_total{reason=\"PostChaosCheck\",involved_object_name=\"sample-cpu-hog\", involved_object_namespace=\"litmus\", involved_object_kind=\"ChaosEngine\"} OR on() vector(0))",
           "format": "time_series",
           "instant": false,
           "interval": "",
           "intervalFactor": 2,
-          "legendFormat": "catalogue-cpu-hog",
+          "legendFormat": "sample-cpu-hog",
           "refId": "A",
           "step": 2
         },
@@ -681,7 +681,7 @@
       },
       "yaxes": [
         {
-          "format": "s",
+          "format": "ms",
           "logBase": 1,
           "min": 0,
           "show": true
