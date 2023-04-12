@@ -113,7 +113,6 @@ Litmus : `admin` / `litmus`.
 - Add first class support for `mitmproxy` (ship deployment)
 - ~~Add first class support for remote agent?~~
 - ~~Try GitOps scenarios?~~
-- Add this repo (as branch here - just like `gh_pages`?)
 - Manifests Naming
 - Fix annoying terraform plan ` yaml_incluster`
 - Add knative-serving/eventing/dns (using `nip.io`?)
@@ -122,21 +121,20 @@ Litmus : `admin` / `litmus`.
 - Test drive 3.0-beta
 - Introduce kubeconfig module so we don't rely on environment w/o `kind`
 - `disk-fill` does not yet play with containerd?
-- Catchup scheduled sock-shop workflow
-- Try Prometheus alerts
-- How would eBPF/Cilium help?
+- Catchup `cron` scheduled sock-shop workflow
+- Introduce PrometheusRule Sock-Shop alerts
+- Improve Cilium integration (bring back from `flux-conductor`)
 - Recover chaos "enabled" in Sock Shop Dashboard
 - ~~Introduce istio based tracing~~
 
 ## Known Issues
 - Some experiments from `litmus-go` appear to rely on `/var/run/docker.sock` which does not exist with containerd based environments ([see](https://docs.litmuschaos.io/docs/troubleshooting))
 - Knative deployment straight from github deployment not possible
-- knative challenging (Some bits need `kustomize.toolkit.fluxcd.io/substitute: disabled` in our context, other things need tweaks to upstream yaml to play with GitOps "... configured")
+- knative challenging, should probably merge `kustomize.toolkit.fluxcd.io/substitute: disabled` via `kustomize`. Other things need tweaks to upstream yaml to play with GitOps "... configured" / Managed fields)
 - Istio Ingress appears to have an image pulling issue, so it takes a while to come up
-- litmus release removal should remove default agent?
+- litmus `helm` release removal should remove default agent?
 
 ## Misc/Random Bits
-- https://istio.io/latest/docs/setup/install/helm
 - https://docs.cilium.io/en/stable/network/istio/
 - https://knative.dev/docs/install/installing-istio/#installing-istio
 - Deploy knative straight from github? like flux-monitoring.yaml?
