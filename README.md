@@ -19,12 +19,14 @@ This repo is derived from [flux-conductr](https://github.com/deas/flux-conductr)
 - Tightly integrated Prometheus Stack including Grafana provisioned for the Sock Shop Appliation
 - Loki
 - Istio Eventing/Serving/Tracing (zipkin)
+- Cilium
 - Knative
 - [Locust](https://locust.io/) load testing (supporting the UI)
 - Portal API usage examples
 - Support for deployment in proxy/custom CA environments
-- `flux`-/`terraform` Deployment
-- `nix` Dev Experience
+- Flux-/Terraform Deployment
+- Nix Dev Experience
+- Doom (Opt-In/Next Gen)
 
 ## Bootrapping
 Even though, we am trying to cover most things declaratively, some random bits may be covered by `make` targets. Simply calling the default target:
@@ -116,16 +118,16 @@ Litmus : `admin` / `litmus`.
 - Manifests Naming
 - Fix annoying terraform plan ` yaml_incluster`
 - Add knative-serving/eventing/dns (using `nip.io`?)
-- How do we manage litmus projects (using ui?)?
 - Add mongodb/prometheus convenience (e.g. auth) targets to `Makefile`
 - Test drive 3.0-beta
-- Introduce kubeconfig module so we don't rely on environment w/o `kind`
 - `disk-fill` does not yet play with containerd?
 - Catchup `cron` scheduled sock-shop workflow
 - Introduce PrometheusRule Sock-Shop alerts
-- Improve Cilium integration (bring back from `flux-conductor`)
 - Recover chaos "enabled" in Sock Shop Dashboard
 - ~~Introduce istio based tracing~~
+- Introduce [deas/calendar_monkey](https://github.com/deas/calendar_monkey)? ;)
+- Use NodePort instead of LoadBalancer locally (just like we do it in `flux-conductr`)
+
 
 ## Known Issues
 - Some experiments from `litmus-go` appear to rely on `/var/run/docker.sock` which does not exist with containerd based environments ([see](https://docs.litmuschaos.io/docs/troubleshooting))

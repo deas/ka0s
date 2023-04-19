@@ -1,22 +1,60 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
 kind: Kustomization
 metadata:
-  name: infrastructure
+  name: infra-controllers
   namespace: flux-system
 spec:
-  #decryption:
-  #  provider: sops
-  #  secretRef:
-  #    name: sops-gpg
+  # decryption:
+  #   provider: sops
+  #   secretRef:
+  #     name: sops-gpg
   interval: 10m0s
   sourceRef:
     kind: GitRepository
     name: flux-system
-  path: ./infrastructure/local
+  # path: ./infrastructure/local
+  path: ./infrastructure/local/controllers
   prune: true
-  #postBuild:
-  #  substitute: # TODO: for the moment, we don't use this to avoid messing with `kustomize.toolkit.fluxcd.io/substitute: disabled` in knative-operator
-  #    gitops_branch: wip
-  #    env: testing # May be broader scope
-  #    # aws_acc_id: "TODO"
-  #    # aws_region: eu-central-1
+  wait: true # Either wait OR do healthChecks
+  postBuild:
+    substitute:
+      gitops_branch: main
+      env: testing
+      aws_acc_id: "TODO"
+      # aws_region: eu-central-1
+  #    aws_account_id: ...
+  #    cluster_name: flux-conductr
+  # healthChecks:
+  #   - apiVersion: helm.toolkit.fluxcd.io/v2beta1
+  #     kind: HelmRelease
+  #     name: kube-prometheus-stack
+  #     namespace: monitoring
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: infra-configs
+  namespace: flux-system
+spec:
+  # decryption:
+  #   provider: sops
+  #   secretRef:
+  #     name: sops-gpg
+  interval: 10m0s
+  dependsOn:
+    - name: infra-controllers
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  # path: ./infrastructure/local
+  path: ./infrastructure/local/configs
+  prune: true
+  # wait: true No downstream deps, no wait
+  postBuild:
+    substitute:
+      gitops_branch: main
+      env: testing
+      aws_acc_id: "TODO"
+      # aws_region: eu-central-1
+  #    aws_account_id: ...
+  #    cluster_name: flux-conductr

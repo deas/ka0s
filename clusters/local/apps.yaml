@@ -10,7 +10,7 @@ spec:
   #    name: sops-gpg
   interval: 10m0s
   dependsOn:
-    - name: infrastructure
+    - name: infra-controllers
   sourceRef:
     kind: GitRepository
     name: flux-system

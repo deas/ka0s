@@ -7,7 +7,7 @@ variable "kind_cluster_name" {
 
 variable "kind_cluster_image" {
   type    = string
-  default = null
+  default = "kindest/node:v1.25.8"
 }
 
 variable "id_rsa_ro_path" {
@@ -44,6 +44,43 @@ variable "dns_hosts" {
 variable "extra_mounts" {
   type    = list(map(string))
   default = []
+}
+
+variable "extra_port_mappings" {
+  type = list(map(string))
+  default = [
+    /*
+    {
+      container_port = 30080
+      host_port      = 3000 # Grafana
+    },
+    {
+      container_port = 30180
+      host_port      = 3100 # Loki
+    },
+    {
+      container_port = 30280
+      host_port      = 9411 # Zipkin
+    },
+    {
+      container_port = 30380
+      host_port      = 10080 # Istio-Ingress
+    },
+    {
+      container_port = 30480
+      host_port      = 10180 # Litmus-Server
+    },
+    {
+      container_port = 30580
+      host_port      = 10280 # Hubble-UI
+    }
+*/
+  ]
+}
+
+variable "cilium_helmrelease_path" {
+  type    = string
+  default = "../infrastructure/lib/config/cilium/release-cilium.yaml"
 }
 
 variable "metallb" {

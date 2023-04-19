@@ -1,0 +1,6 @@
+# TODO: Could go to controllers - no dep on controller
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: kube-system
+resources:
+- release-cilium.yaml

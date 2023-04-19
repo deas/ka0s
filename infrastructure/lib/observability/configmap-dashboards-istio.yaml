@@ -909,3 +909,5 @@ metadata:
     grafana_dashboard: "1"
   name: istio-services-grafana-dashboards
   namespace: monitoring
+  annotations:
+    kustomize.toolkit.fluxcd.io/substitute: disabled

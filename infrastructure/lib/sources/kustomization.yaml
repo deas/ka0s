@@ -14,5 +14,7 @@ resources:
   - metrics-server.yaml
   - kiali.yaml
   - openzipkin.yaml
+  - cilium.yaml
+  - deas.yaml
   # - jaegertracing.yaml
   # - kubernetes-event-exporter.yaml

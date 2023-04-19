@@ -1,0 +1,19 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: doom
+  namespace: doom
+spec:
+  releaseName: doom
+  chart:
+    spec:
+      chart: doom
+      sourceRef:
+        kind: HelmRepository
+        name: deas
+        namespace: flux-system
+  interval: 5m
+  install:
+    remediation:
+      retries: 3
+  values: {}

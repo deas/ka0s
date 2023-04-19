@@ -21,7 +21,7 @@ spec:
     defaultRules:
       create: true
       # rules:
-        # alertmanager: false # true
+        # alertmanager: true
         # etcd: true
         # configReloaders: true
         # general: true
@@ -93,8 +93,8 @@ spec:
         ##
         # alertmanagerConfiguration: {}
         ## Example with select a global alertmanagerconfig
-        # alertmanagerConfiguration:
-        #    name: global
+        #alertmanagerConfiguration:
+        #   name: global
         ## Defines the strategy used by AlertmanagerConfig objects to match alerts. eg:
         ##
         alertmanagerConfigMatcherStrategy: {}
@@ -220,10 +220,12 @@ spec:
       #   url: https://{{ printf "%s-prometheus.svc" .Release.Name }}:9090
       #   version: 1
       service:
-        type: LoadBalancer
+        # type: LoadBalancer
+        # annotations:
+        #   metallb.universe.tf/allow-shared-ip: "litmus-share"
+        #   # metallb.universe.tf/loadBalancerIPs: "172.18.255.200"
+        # type: NodePort
+        # nodePort: 30080
         port: 3000 # default is 80
-        annotations:
-          metallb.universe.tf/allow-shared-ip: "litmus-share"
-          # metallb.universe.tf/loadBalancerIPs: "172.18.255.200"
 
 

@@ -3,5 +3,6 @@ kind: Kustomization
 buildMetadata: [originAnnotations]
 resources:
   - ../common
+  - doom
 #  - acme
 #  - flux-system

@@ -21,6 +21,9 @@ SHELL := /usr/bin/env bash
 DOCKER_TAG_VERSION_DEVELOPER_TOOLS := 1.3
 DOCKER_IMAGE_DEVELOPER_TOOLS := cft/developer-tools
 REGISTRY_URL := gcr.io/cloud-foundation-cicd
+CLUSTER_NAME = ka0s-control-plane
+DOCKER_RESTART = no
+
 TF_PLUGINS_NAME := tf-plugins-ka0s
 TF_PLUGINS_IMAGE := deas/$(TF_PLUGINS_NAME):latest
 
@@ -86,10 +89,13 @@ apply: ## Terraform apply
 
 .PHONY: quick-destroy
 quick-destroy: ## Quick destruction
-	docker stop ka0s-control-plane || true
-	docker rm ka0s-control-plane || true
-# rm -rf 	terraform.tfstate*
-	terraform state list | cut -f 1 -d '[' | sort | uniq | xargs terraform state rm
+	docker stop $(CLUSTER_NAME)
+	docker rm $(CLUSTER_NAME)
+	rm -rf 	terraform.tfstate*
+
+.PHONY: quick-destroy
+docker-update-restart: ## Update Docker Restart Policy
+	docker update --restart=$(DOCKER_RESTART) $(CLUSTER_NAME)
 
 .PHONY: open-app
 open-app: ## Open the application in your browser

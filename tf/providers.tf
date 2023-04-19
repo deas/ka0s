@@ -31,6 +31,16 @@ provider "kubectl" {
   load_config_file       = local.load_config_file
 }
 
+provider "helm" {
+  kubernetes {
+    # config_path = kind_cluster.default.kubeconfig
+    host                   = local.host
+    client_certificate     = local.client_certificate
+    client_key             = local.client_key
+    cluster_ca_certificate = local.cluster_ca_certificate
+  }
+}
+
 provider "kustomization" {
   # KUBECONFIG_PATH
   # kubeconfig_path = 
